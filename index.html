@@ -16,7 +16,7 @@
    角色 char：queen king whiteRabbit hatter cheshire caterpillar alice
      flamingo dodo cardSoldier twins marchHare
    ground.pattern：brick speckle stripe checker（鏡中棋盤）
-   內容可加 media 作品集：{ title, items: [{ title, youtube | image + url }], more: { label, url } }
+   內容可加 media 作品集：{ title（選填，不填就不顯示小標題）, items: [{ title, youtube | image + url }], more: { label, url } }
    ================================================================ */
 const DATA = {
   city: { zh: '鏡中番薯的', en: 'The Looking-Glass Sweet Potato’s' },
@@ -49,7 +49,6 @@ const DATA = {
           desc: '玫瑰園裡有一朵花，安靜地說著自己的故事——這裡收藏番薯老師的文字與創作。', descEn: 'In the rose garden, one flower quietly tells its own story: Teacher Sweet Potato’s writing and creative work.',
           // 作品集：youtube 可填完整網址或 11 碼影片 ID；也可改填 image（封面圖網址）與 url（作品連結）
           media: {
-            title: '我的文字創遊', titleEn: 'My journeys in writing',
             items: [
               { title: '流光', titleEn: 'Flowing Light', image: 'cover:liuguang', url: 'https://padlet.com/tea752/padlet-s0253mwws55ch3qykr3g' },
               { title: 'AI共作好好玩', titleEn: 'Fun AI co-creation', image: 'cover:ai', url: 'https://padlet.com/tea752/ai-seqhdpy99k16phxn' }
@@ -59,7 +58,6 @@ const DATA = {
         { id: 'r2', name: '青春的第N種綻放', en: 'The Nth Way Youth Blooms', model: 'gallery',
           desc: '每一位學生，都是一種不一樣的綻放——這裡收藏學生們的精彩創作。', descEn: 'Every student blooms in a different way. A collection of the students’ wonderful work.',
           media: {
-            title: '學生作品集', titleEn: 'Student portfolio',
             items: [
               { title: '304學習歷程', titleEn: 'Class 304 learning portfolio', image: 'cover:class304', url: 'https://padlet.com/tea752/304-k2qyleoc197jv4py' },
               { title: '歷屆作品', titleEn: 'Work from past years', image: 'cover:pastworks', url: 'https://www.swsh.hlc.edu.tw/ischool/publish_page/196/?cid=16708' }
@@ -120,7 +118,6 @@ const DATA = {
         { id: 'c1', name: '樹梢上的魔法課', en: 'Magic Lessons in the Treetops', model: 'classroom',
           desc: '爬上藏書樹的樹梢，番薯老師的每一堂國文課都掛在這裡，像一本本等著被施咒的魔法書。挑一堂，開始上課吧！', descEn: 'Climb to the top of the book tree: every one of Teacher Sweet Potato’s Chinese lessons hangs here like a spellbook waiting to be opened. Pick one and class begins!',
           media: {
-            title: '我的課程', titleEn: 'My courses',
             items: [
               { title: '閱讀與寫作', titleEn: 'Reading and writing', image: 'cover:reading', url: 'https://padlet.com/tea752/114-1bvveapxb3td0xva' },
               { title: '超時空偵探', titleEn: 'Time-Travel Detectives', image: 'cover:peach', url: 'https://padlet.com/tea752/114-2-2-ryl44dwivps3mcgr' },
@@ -5396,7 +5393,7 @@ function mediaHTML(m) {
   currentMedia = m;
   const items = m.items || [];
   return `
-    <div class="media-head"><span class="num">${String(items.length).padStart(2, '0')}</span><h3>${esc(tr(m.title, m.titleEn))}</h3></div>
+    ${m.title ? `<div class="media-head"><span class="num">${String(items.length).padStart(2, '0')}</span><h3>${esc(tr(m.title, m.titleEn))}</h3></div>` : '<div style="height:14px"></div>'}
     <div class="media-grid">${items.map((x, i) => {
       const img = mediaImg(x), url = mediaUrl(x), g = MEDIA_GRAD[i % MEDIA_GRAD.length], t = tr(x.title, x.titleEn);
       const inner = `<span class="media-cover ${img ? 'has-img' : ''}" style="--g1:${g[0]};--g2:${g[1]}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" data-fallback>` : ''}<span class="media-cover-title">${esc(t)}</span><span class="media-play" aria-hidden="true">${url ? (ytId(x.youtube) && !x.url ? '▶' : '↗') : '♥'}</span></span>
