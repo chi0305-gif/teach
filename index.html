@@ -45,8 +45,8 @@ const DATA = {
       story: { zh: '紅心皇后的城堡', en: 'The Queen of Hearts’ Castle', char: 'queen' },
       summary: '收藏老師與學生的精彩創作', summaryEn: 'A collection of wonderful work by the teacher and students',
       items: [
-        { id: 'r1', name: '老師的創作', en: 'The teacher’s work', model: 'easel',
-          desc: '收藏老師的精彩創作。', descEn: 'A collection of the teacher’s work.',
+        { id: 'r1', name: '一朵花的獨白', en: 'A Flower’s Monologue', model: 'easel',
+          desc: '玫瑰園裡有一朵花，安靜地說著自己的故事——這裡收藏番薯老師的文字與創作。', descEn: 'In the rose garden, one flower quietly tells its own story: Teacher Sweet Potato’s writing and creative work.',
           // 作品集：youtube 可填完整網址或 11 碼影片 ID；也可改填 image（封面圖網址）與 url（作品連結）
           media: {
             title: '我的文字創遊', titleEn: 'My journeys in writing',
@@ -56,8 +56,8 @@ const DATA = {
             ],
             more: { label: '看官網影音作品頁', labelEn: 'See the official video page', url: '' }
           } },
-        { id: 'r2', name: '學生的創作', en: 'Students’ work', model: 'gallery',
-          desc: '收藏學生的精彩創作。', descEn: 'A collection of the students’ work.',
+        { id: 'r2', name: '青春的第N種綻放', en: 'The Nth Way Youth Blooms', model: 'gallery',
+          desc: '每一位學生，都是一種不一樣的綻放——這裡收藏學生們的精彩創作。', descEn: 'Every student blooms in a different way. A collection of the students’ wonderful work.',
           media: {
             title: '學生作品集', titleEn: 'Student portfolio',
             items: [
@@ -2706,7 +2706,6 @@ async function init() {
   buildWalkers();
   buildAlice();
   buildSailboats();
-  buildKaiju();
   buildStorm();
   setProgress(0.86); await tick();
   buildLabels();
@@ -4287,7 +4286,7 @@ Object.assign(ARCH, {
     a('box', 0.08, 0.06, 0.38, 0.2, 0.012, 0.13, '#fffaf3', -0.3); a('box', 0.08, 0.072, 0.38, 0.004, 0.006, 0.13, '#cdb6f4', -0.3);
     return 1.42;
   },
-  /* ♥ 老師的創作：畫架、畫布、調色盤與畫筆 */
+  /* ♥ 一朵花的獨白（老師的創作）：畫架、畫布、調色盤與畫筆 */
   easel(a) {
     plinth(a, '#ffe6ef');
     a('cyl', -0.16, 0.06, 0.06, 0.03, 0.8, 0.03, '#c8a088', 0, -0.12, 0.18); a('cyl', 0.16, 0.06, 0.06, 0.03, 0.8, 0.03, '#c8a088', 0, -0.12, -0.18);
@@ -4306,7 +4305,7 @@ Object.assign(ARCH, {
     a('cyl', -0.12, 0.06, 0.38, 0.14, 0.14, 0.14, M.pinkD);
     return 0.86;
   },
-  /* ♥ 學生的創作：展示牆上的金框作品、聚光燈與欣賞長椅 */
+  /* ♥ 青春的第N種綻放（學生的創作）：展示牆上的金框作品、聚光燈與欣賞長椅 */
   gallery(a) {
     plinth(a, '#ffe6ef');
     a('box', 0, 0.06, -0.3, 0.94, 0.5, 0.08, M.pink);
@@ -5643,13 +5642,11 @@ function pick(cx, cy) {
   _ndc.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(_ndc, camera);
   const cands = [...Object.values(dk.meshes).filter((m) => m !== dk.meshes.shadow && m.count > 0), ...mainMeshes, ...islandTopMeshes, ...flows.filter((f) => f.tube.visible).map((f) => f.tube)];
-  if (kaiju) { const km = []; kaiju.g.traverse((m) => { if (m.isMesh) km.push(m); }); cands.unshift(...km); }
   if (alice) cands.unshift(...alice.g.children.flatMap((c) => (c.isMesh ? [c] : c.children.filter((m) => m.isMesh))));
   const hits = raycaster.intersectObjects(cands, false);
   for (const h of hits) {
     const o = h.object;
     if (o.userData.alice) { talkAlice(); return; }
-    if (o.userData.kaiju) { roarKaiju(); return; }
     if (o.userData.dyn !== undefined && h.instanceId !== undefined) { const wi = dk.owner[o.userData.dyn][h.instanceId]; if (wi >= 0) { selectWalker(wi); return; } }
     if (o.userData.badge !== undefined && h.instanceId !== undefined) { selectWalker(badgeMats[o.userData.badge].owner[h.instanceId]); return; }
     if (o.userData.flow !== undefined) { selectFlow(o.userData.flow); return; }
@@ -5900,7 +5897,7 @@ function updateAlice(dt) {
 }
 
 /* =====================================================================
-   共用：用零件庫的形狀拼一個可以動的 Group（帆船、海龍用）
+   共用：用零件庫的形狀拼一個可以動的 Group（帆船用）
    ===================================================================== */
 const _gMats = new Map();
 function gMat(c) { const k = new THREE.Color(c).getHexString(); if (!_gMats.has(k)) _gMats.set(k, new THREE.MeshStandardMaterial({ color: new THREE.Color(c), roughness: 0.72 })); return _gMats.get(k); }
@@ -5942,183 +5939,6 @@ function updateSailboats(dt) {
   }
 }
 
-/* =====================================================================
-   🐉 海上的噴火恐龍「霧霧」：原創角色，繞著群島在海裡散步，
-   偶爾停下來張嘴噴火（點牠也會噴）。噴火聲以 Web Audio 即時合成，
-   瀏覽器規定要在使用者點過頁面後才能出聲。
-   ===================================================================== */
-let kaiju = null;
-const KAIJU_SAY = ['🔥 嗷嗚——！', '🔥 呼——好熱！', '🔥 我只是打個噴嚏……'];
-function buildKaiju() {
-  let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
-  islands.forEach((isl) => { x0 = Math.min(x0, isl.x); x1 = Math.max(x1, isl.x); z0 = Math.min(z0, isl.z); z1 = Math.max(z1, isl.z); });
-  const col = { body: '#7cc7a8', dark: '#5aa88a', belly: '#eef6d4', plate: '#b9a6f0', eye: '#3a2d3f', mouth: '#c4466a', tooth: '#fffaf0', claw: '#f6efe0' };
-  const g = new THREE.Group(), root = pivot(g, 0, 0, 0), a = gAdder(root, 'kaiju');
-  // 腿（以髖部為軸擺動）
-  const legs = [-0.24, 0.24].map((x) => {
-    const p = pivot(root, x, 0.48, -0.02), l = gAdder(p, 'kaiju');
-    l('cyl', 0, -0.48, 0, 0.22, 0.5, 0.22, col.body); l('sphere', 0, -0.06, 0, 0.3, 0.3, 0.3, col.body);
-    l('sphere', 0, -0.52, 0.06, 0.26, 0.12, 0.34, col.dark);
-    return p;
-  });
-  // 身體、肚子、手
-  a('sphere', 0, 0.42, 0, 0.66, 0.86, 0.58, col.body, 0, -0.18);
-  a('sphere', 0, 0.44, 0.12, 0.5, 0.7, 0.4, col.belly, 0, -0.18);
-  for (let k = 0; k < 4; k++) a('box', 0, 0.55 + k * 0.13, 0.31 - k * 0.012, 0.3 - k * 0.03, 0.012, 0.03, col.dark, 0, -0.18);
-  [-1, 1].forEach((sx) => { a('cyl', sx * 0.3, 0.8, 0.18, 0.08, 0.26, 0.08, col.body, 0, -1.1, sx * 0.4); a('sphere', sx * 0.33, 0.78, 0.4, 0.09, 0.09, 0.09, col.claw); });
-  // 背鰭
-  [[0.62, -0.26, 0.17], [0.86, -0.25, 0.22], [1.08, -0.17, 0.2], [0.42, -0.3, 0.14]].forEach(([y, z, s]) => a('cone', 0, y, z, s * 0.5, s * 1.4, s, col.plate, 0, -0.5));
-  // 尾巴（一節節，整條左右擺）
-  const tail = pivot(root, 0, 0.32, -0.28), t = gAdder(tail, 'kaiju');
-  for (let k = 0; k < 5; k++) { const s = 0.32 - k * 0.055; t('sphere', 0, -k * 0.06, -0.12 - k * 0.17, s, s * 0.9, s * 1.2, col.body); if (k < 4) t('cone', 0, s * 0.35 - k * 0.06, -0.12 - k * 0.17, s * 0.25, s * 0.55, s * 0.4, col.plate, 0, -0.6); }
-  // 頭（脖子為軸）與下顎
-  const head = pivot(root, 0, 1.12, 0.16), h = gAdder(head, 'kaiju');
-  h('sphere', 0, 0.06, 0.04, 0.4, 0.34, 0.42, col.body);
-  h('rbox', 0, 0.02, 0.26, 0.3, 0.13, 0.3, col.body);
-  h('sphere', -0.11, 0.15, 0.2, 0.08, 0.09, 0.06, '#ffffff'); h('sphere', 0.11, 0.15, 0.2, 0.08, 0.09, 0.06, '#ffffff');
-  h('sphere', -0.11, 0.15, 0.235, 0.045, 0.055, 0.03, col.eye); h('sphere', 0.11, 0.15, 0.235, 0.045, 0.055, 0.03, col.eye);
-  h('sphere', -0.15, 0.04, 0.24, 0.06, 0.035, 0.02, '#f7a9bd'); h('sphere', 0.15, 0.04, 0.24, 0.06, 0.035, 0.02, '#f7a9bd');
-  h('cone', -0.07, 0.04, 0.38, 0.03, 0.05, 0.03, col.tooth, 0, Math.PI); h('cone', 0.07, 0.04, 0.38, 0.03, 0.05, 0.03, col.tooth, 0, Math.PI);
-  const jaw = pivot(head, 0, 0.0, 0.1), j = gAdder(jaw, 'kaiju');
-  j('rbox', 0, -0.1, 0.13, 0.27, 0.08, 0.28, col.body);
-  j('box', 0, -0.03, 0.13, 0.22, 0.02, 0.24, col.mouth);
-  // 火焰粒子池
-  const fireGeo = new THREE.SphereGeometry(0.5, 10, 8), fire = [];
-  const fireGroup = new THREE.Group(); scene.add(fireGroup);
-  for (let k = 0; k < 70; k++) {
-    const m = new THREE.Mesh(fireGeo, new THREE.MeshBasicMaterial({ color: 0xffc040, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false }));
-    m.visible = false; fireGroup.add(m);
-    fire.push({ m, life: 0, max: 0, v: new THREE.Vector3() });
-  }
-  const glow = new THREE.PointLight(0xff8a3c, 0, 9, 1.6); scene.add(glow);
-  g.scale.setScalar(1.15); scene.add(g);
-  const el = document.createElement('div'); el.className = 'bubble say reply'; const say = new CSS2DObject(el); say.visible = false; scene.add(say);
-  kaiju = { dt: 1, g, root, legs, tail, head, jaw, fire, glow, say, t: 0, an: 0.35, dir: 1, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, ax: (x1 - x0) / 2 + R + 1.7, az: (z1 - z0) / 2 + R + 1.3, yaw: 0, roar: 0, nextRoar: 6 + Math.random() * 6, emit: 0,
-    turn: 18 + Math.random() * 14, mouth: new THREE.Vector3(), fwd: new THREE.Vector3(), speed: 0.3 };
-  placeKaiju(0);
-}
-// 繞著群島外圍的橢圓形海路（貼近島嶼，鏡頭前方也看得到）
-function kaijuPt(an) {
-  const k = kaiju, w = 1 + Math.sin(an * 3) * 0.05;
-  return { x: k.cx + Math.sin(an) * k.ax * w, z: k.cz + Math.cos(an) * k.az * w };
-}
-function placeKaiju(walk) {
-  const k = kaiju, p = kaijuPt(k.an), x = p.x, z = p.z;
-  // 前進方向（數值微分）
-  const q = kaijuPt(k.an + 0.01 * k.dir), dx = q.x - x, dz = q.z - z;
-  const bob = Math.abs(Math.sin(k.t * 3.2)) * 0.05 * walk;
-  k.g.position.set(x, WATER_Y - 0.5 + bob, z);
-  // 走路時面向前進方向；噴火時轉身面向外海（不會燒到島）
-  const want = k.roar > 0 ? Math.atan2(x - k.cx, z - k.cz) + 0.9 * k.dir : Math.atan2(dx, dz);
-  let d = want - k.yaw; d = Math.atan2(Math.sin(d), Math.cos(d));
-  k.yaw += d * Math.min(1, k.dt * 3.5);
-  k.g.rotation.y = k.yaw;
-}
-function roarKaiju() {
-  const k = kaiju; if (!k || k.roar > 0) return;
-  k.roar = 3.2; k.emit = 0;
-  k.say.element.textContent = KAIJU_SAY[Math.floor(Math.random() * KAIJU_SAY.length)];
-  setTimeout(() => SFX.fire(), 900);
-}
-let _kq = null;
-function updateKaiju(dt) {
-  const k = kaiju; if (!k) return;
-  k.t += dt; k.dt = dt;
-  let walk = 1;
-  if (k.roar > 0) {
-    k.roar -= dt;
-    const e = 3.2 - k.roar;                 // 已經過的時間
-    walk = 0;
-    const open = e < 0.5 ? e / 0.5 : e < 2.5 ? 1 : Math.max(0, 1 - (e - 2.5) / 0.5);
-    k.jaw.rotation.x = open * 0.75;
-    k.head.rotation.x = -open * 0.25 + Math.sin(e * 30) * 0.015 * open;
-    k.say.visible = e > 0.4 && e < 2.8;
-    // 噴火：0.6–2.3 秒之間不斷吐出火球
-    if (e > 0.9 && e < 2.5) {
-      k.emit += dt * 34;
-      k.head.updateWorldMatrix(true, false);
-      k.mouth.set(0, -0.02, 0.48).applyMatrix4(k.head.matrixWorld);
-      if (!_kq) _kq = new THREE.Quaternion();
-      k.fwd.set(0, -0.12, 1).applyQuaternion(k.head.getWorldQuaternion(_kq)).normalize();
-      while (k.emit >= 1) {
-        k.emit -= 1;
-        const p = k.fire.find((f) => f.life <= 0); if (!p) break;
-        p.max = p.life = 0.55 + Math.random() * 0.35;
-        p.m.position.copy(k.mouth);
-        p.v.copy(k.fwd).multiplyScalar(3.4 + Math.random() * 1.4);
-        p.v.x += (Math.random() - 0.5) * 0.9; p.v.y += (Math.random() - 0.3) * 0.7; p.v.z += (Math.random() - 0.5) * 0.9;
-        p.m.visible = true;
-      }
-    }
-    k.glow.position.copy(k.mouth);
-    k.glow.intensity = e > 0.9 && e < 2.6 ? 22 + Math.random() * 10 : 0;
-    k.say.position.set(k.g.position.x, k.g.position.y + 2.0, k.g.position.z);
-  } else {
-    k.jaw.rotation.x *= 0.9; k.head.rotation.x = Math.sin(k.t * 1.6) * 0.06;
-    k.nextRoar -= dt;
-    if (k.nextRoar <= 0) { roarKaiju(); k.nextRoar = 9 + Math.random() * 9; }
-    k.turn -= dt;
-    if (k.turn <= 0) { k.dir *= -1; k.turn = 18 + Math.random() * 16; }   // 偶爾轉身往回走
-    k.an += (k.speed / ((k.ax + k.az) / 2)) * k.dir * dt;
-  }
-  // 走路：兩腿交替、尾巴擺動
-  const ph = k.t * 3.2;
-  k.legs[0].rotation.x = Math.sin(ph) * 0.45 * walk; k.legs[1].rotation.x = -Math.sin(ph) * 0.45 * walk;
-  k.root.rotation.z = Math.sin(ph) * 0.05 * walk;
-  k.tail.rotation.y = Math.sin(k.t * 1.8) * 0.35;
-  placeKaiju(walk);
-  for (const p of k.fire) {
-    if (p.life <= 0) continue;
-    p.life -= dt;
-    if (p.life <= 0) { p.m.visible = false; continue; }
-    const u = 1 - p.life / p.max;
-    p.v.multiplyScalar(1 - dt * 1.2); p.v.y += dt * 1.1;
-    p.m.position.addScaledVector(p.v, dt);
-    p.m.scale.setScalar(0.12 + u * 0.75);
-    p.m.material.color.setHSL(Math.max(0, 0.12 - u * 0.13), 1, 0.58 - u * 0.12);
-    p.m.material.opacity = (1 - u) * 0.85;
-  }
-}
-
-/* =====================================================================
-   🔊 音效：噴火聲（不需要音檔，Web Audio 即時合成）
-   瀏覽器要求使用者先點過頁面，之後才會出聲。
-   ===================================================================== */
-const SFX = (() => {
-  let ctx = null;
-  const unlock = () => {
-    try { if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); } catch (e) { /* 不支援就安靜 */ }
-  };
-  ['pointerdown', 'keydown', 'touchstart'].forEach((ev) => document.addEventListener(ev, unlock, { passive: true }));
-  function noise(len) {
-    const sr = ctx.sampleRate, buf = ctx.createBuffer(1, Math.floor(sr * len), sr), d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const s = ctx.createBufferSource(); s.buffer = buf; return s;
-  }
-  return {
-    fire() {
-      if (!ctx || ctx.state !== 'running' || document.hidden) return;
-      const t = ctx.currentTime, len = 1.9;
-      const out = ctx.createGain(); out.gain.value = 0.55; out.connect(ctx.destination);
-      // 呼——的火焰氣流：帶通噪音，音高慢慢往下
-      const n = noise(len), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8;
-      bp.frequency.setValueAtTime(1400, t); bp.frequency.exponentialRampToValueAtTime(380, t + len);
-      const ng = ctx.createGain(); ng.gain.setValueAtTime(0.0001, t); ng.gain.exponentialRampToValueAtTime(0.9, t + 0.12); ng.gain.setValueAtTime(0.9, t + 1.3); ng.gain.exponentialRampToValueAtTime(0.0001, t + len);
-      n.connect(bp); bp.connect(ng); ng.connect(out); n.start(t); n.stop(t + len);
-      // 劈啪：高頻短促噪音
-      const c = noise(len), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
-      const cg = ctx.createGain(); cg.gain.setValueAtTime(0.0001, t);
-      for (let k = 0; k < 14; k++) { const tt = t + 0.1 + Math.random() * 1.5; cg.gain.setValueAtTime(0.0001, tt); cg.gain.linearRampToValueAtTime(0.35, tt + 0.01); cg.gain.linearRampToValueAtTime(0.0001, tt + 0.06); }
-      c.connect(hp); hp.connect(cg); cg.connect(out); c.start(t); c.stop(t + len);
-      // 低沉的吼聲
-      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(55, t + 1.4);
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
-      const og = ctx.createGain(); og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.35, t + 0.15); og.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
-      o.connect(lp); lp.connect(og); og.connect(out); o.start(t); o.stop(t + 1.6);
-    }
-  };
-})();
-
 let lastNow = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
@@ -6132,7 +5952,6 @@ function loop(now) {
     updateWalkers(dt);
     updateAlice(dt);
     updateSailboats(dt);
-    updateKaiju(dt);
     updateClouds(dt);
     waterU.uTime.value = simTime;
     flowTimeU.value = simTime;
