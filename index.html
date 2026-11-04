@@ -3286,16 +3286,8 @@ function groundTexture(kind) {
     }
   });
 }
-/* 島嶼側邊的撲克牌飾帶：六個邊都是一張橫放的牌面
-   每座島依花色設計：♥ 玫瑰園＝Q♥＋玫瑰、♣ 兔子洞＝J♣＋懷錶、♦ 百寶箱＝10♦＋高帽（帽上標價 10/6）、♠ 藏書樹＝A♠＋柴郡貓的笑
-   想換點數或圖案，改 BAND_STYLE 即可（alt 可用 rose／watch／hat／grin） */
-const BAND_H = 0.42;   // 島側牌面的高度（世界單位）
-const BAND_STYLE = {
-  '♥': { rank: 'Q', ink: '#d6456b', alt: 'rose' },
-  '♣': { rank: 'J', ink: '#4a3a5c', alt: 'watch' },
-  '♦': { rank: '10', ink: '#d6456b', alt: 'hat' },
-  '♠': { rank: 'A', ink: '#4a3a5c', alt: 'grin' }
-};
+/* 島嶼側邊的飾帶：島的主色＋白色撲克牌符號（♥♠♦♣ 輪流），六個邊都有 */
+const BAND_H = 0.16;   // 飾帶高度（世界單位）
 function drawSuit(g, suit, x, y, s, col) {
   g.save(); g.translate(x, y); g.scale(s / 100, s / 100); g.fillStyle = col; g.beginPath();
   const heart = (flip) => {
@@ -3313,68 +3305,18 @@ function drawSuit(g, suit, x, y, s, col) {
   }
   g.fill(); g.restore();
 }
-function drawMotif(g, kind, x, y, s, col, accent) {
-  g.save(); g.translate(x, y); g.scale(s / 100, s / 100); g.lineCap = 'round'; g.lineJoin = 'round';
-  if (kind === 'rose') {
-    g.fillStyle = '#7fbf8f'; g.beginPath(); g.ellipse(-30, 26, 22, 10, -0.5, 0, Math.PI * 2); g.ellipse(30, 26, 22, 10, 0.5, 0, Math.PI * 2); g.fill();
-    g.fillStyle = col; g.beginPath(); g.arc(0, 0, 34, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = '#fffaf3'; g.lineWidth = 6; g.beginPath();
-    for (let a = 0; a < Math.PI * 5; a += 0.2) { const r = 3 + a * 1.9; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
-    g.stroke();
-  } else if (kind === 'watch') {
-    g.fillStyle = accent; g.beginPath(); g.arc(0, 4, 38, 0, Math.PI * 2); g.fill();
-    g.fillStyle = '#fffaf3'; g.beginPath(); g.arc(0, 4, 29, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = accent; g.lineWidth = 7; g.beginPath(); g.arc(0, -40, 9, 0, Math.PI * 2); g.stroke();
-    g.strokeStyle = col; g.lineWidth = 6; g.beginPath(); g.moveTo(0, 4); g.lineTo(0, -16); g.moveTo(0, 4); g.lineTo(14, 12); g.stroke();
-  } else if (kind === 'hat') {
-    g.fillStyle = col; g.fillRect(-26, -40, 52, 62); g.beginPath(); g.ellipse(0, 24, 46, 12, 0, 0, Math.PI * 2); g.fill();
-    g.fillStyle = accent; g.fillRect(-26, 4, 52, 12);
-    g.fillStyle = '#fffaf3'; g.fillRect(-4, -34, 26, 18);
-    g.fillStyle = col; g.font = 'bold 13px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('10/6', 9, -25);
-  } else {
-    // 柴郡貓：一彎笑容＋兩隻眼睛
-    g.fillStyle = col; g.beginPath(); g.ellipse(-20, -20, 9, 13, 0, 0, Math.PI * 2); g.ellipse(20, -20, 9, 13, 0, 0, Math.PI * 2); g.fill();
-    g.fillStyle = accent; g.beginPath(); g.ellipse(-20, -20, 3, 10, 0, 0, Math.PI * 2); g.ellipse(20, -20, 3, 10, 0, 0, Math.PI * 2); g.fill();
-    g.fillStyle = col; g.beginPath(); g.arc(0, -4, 46, 0.25, Math.PI - 0.25); g.arc(0, -22, 52, Math.PI - 0.55, 0.55, true); g.closePath(); g.fill();
-    g.strokeStyle = '#fffaf3'; g.lineWidth = 3; g.beginPath();
-    for (let k = -3; k <= 3; k++) { g.moveTo(k * 9, 20); g.lineTo(k * 9, 36); }
-    g.stroke();
-  }
-  g.restore();
-}
 function bandAtlas() {
-  // 每一列＝一座島；每一列是一張「橫放的撲克牌」，貼在島的每一個邊上（左右重複）
-  const rows = DATA.islands.length, W = 1024, RH = 224;
+  // 每一列＝一座島；一列就是「一個邊」的圖案，貼圖左右重複，所以六個邊都有
+  const rows = DATA.islands.length, W = 512, RH = 32, suits = ['♥', '♠', '♦', '♣'];
   const t = canvasTex(W, rows * RH, (g) => {
     DATA.islands.forEach((d, i) => {
-      const y0 = i * RH, st = BAND_STYLE[d.suit] || BAND_STYLE['♥'];
-      const accent = new THREE.Color(d.color).lerp(new THREE.Color('#5a3d5c'), 0.25).getStyle();
+      const y0 = i * RH;
       g.fillStyle = d.color; g.fillRect(0, y0, W, RH);
-      // 牌面
-      const top = y0 + 22, bot = y0 + RH - 18, mid = (top + bot) / 2;
-      g.fillStyle = '#fffaf3'; g.beginPath(); g.roundRect ? g.roundRect(22, top, W - 44, bot - top, 22) : g.rect(22, top, W - 44, bot - top); g.fill();
-      g.strokeStyle = d.color; g.lineWidth = 5; g.setLineDash([16, 9]);
-      g.beginPath(); g.roundRect ? g.roundRect(38, top + 14, W - 76, bot - top - 28, 14) : g.rect(38, top + 14, W - 76, bot - top - 28); g.stroke(); g.setLineDash([]);
-      // 兩端：點數在上、花色在下（像牌角）
-      const corner = (cx) => {
-        g.fillStyle = st.ink; g.font = 'bold 54px Georgia, "Times New Roman", serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-        g.fillText(st.rank, cx, mid - 30); drawSuit(g, d.suit, cx, mid + 34, 46, st.ink);
-      };
-      corner(100); corner(W - 100);
-      // 中間：大花色與主題圖案交錯
-      const n = 5, x0 = 250, x1 = W - 250;
-      for (let k = 0; k < n; k++) {
-        const x = x0 + (x1 - x0) * (k / (n - 1));
-        if (k % 2 === 0) drawSuit(g, d.suit, x, mid, 112, st.ink);
-        else drawMotif(g, st.alt, x, mid, 104, st.ink, accent);
-      }
-      // 上緣金線、下緣陰影
-      g.fillStyle = 'rgba(217,164,65,.9)'; g.fillRect(0, y0, W, 8);
-      g.fillStyle = 'rgba(43,29,63,.22)'; g.fillRect(0, y0 + RH - 8, W, 8);
+      for (let k = 0; k < W / 32; k++) drawSuit(g, suits[(k + i) % 4], k * 32 + 16, y0 + 16, 17, 'rgba(255,248,244,.95)');
+      g.fillStyle = 'rgba(217,164,65,.75)'; g.fillRect(0, y0, W, 2); g.fillStyle = 'rgba(43,29,63,.22)'; g.fillRect(0, y0 + RH - 3, W, 3);
     });
   }, false);
-  t.wrapS = THREE.RepeatWrapping;   // 六個邊都重複同一張牌面
-  t.anisotropy = 8;
+  t.wrapS = THREE.RepeatWrapping;
   return t;
 }
 
@@ -3411,7 +3353,7 @@ function buildIslands() {
     curb.push(hexRing(R - 0.12, R).translate(x, TOP + 0.006, z));
     const b = new THREE.CylinderGeometry(R + 0.004, R + 0.004, BAND_H, 6, 1, true).translate(x, TOP - BAND_H / 2, z);
     const buv = b.attributes.uv;
-    for (let k = 0; k < buv.count; k++) buv.setXY(k, buv.getX(k) * 6, 1 - (isl.i + 1) / rows + (0.01 + buv.getY(k) * 0.98) / rows);
+    for (let k = 0; k < buv.count; k++) buv.setXY(k, buv.getX(k) * 6, 1 - (isl.i + 1) / rows + (0.1 + buv.getY(k) * 0.8) / rows);
     band.push(b);
     const yTop = TOP - BAND_H, yBot = WATER_Y - 0.7, wh = yTop - yBot;
     wall.push(new THREE.CylinderGeometry(R, R * 1.035, wh, 6, 1, true).translate(x, yBot + wh / 2, z));
