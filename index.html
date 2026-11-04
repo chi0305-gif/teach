@@ -424,7 +424,7 @@ body.side-closed .log { right: calc(16px + env(safe-area-inset-right, 0px)); }
 @keyframes logIn { from { transform: translateY(-6px); opacity: 0; } }
 .log time { font: 700 11px/1.5 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .log .ev { font: 700 9px/1 var(--mono); letter-spacing: 1px; border-radius: 99px; padding: 2px 6px; margin-right: 4px; display: inline-block; vertical-align: 1px; }
-.ev.depart { background: var(--alice-pale); } .ev.arrive { background: var(--rose-pale); } .ev.handoff { background: var(--gold-pale); }
+.ev.depart, .ev.patrol { background: var(--alice-pale); } .ev.arrive { background: var(--rose-pale); } .ev.handoff { background: var(--gold-pale); }
 
 /* ---------- legend ---------- */
 .legend { position: fixed; z-index: 11; left: calc(16px + env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); border-radius: 16px; padding: 10px 14px; display: grid; gap: 4px; font-size: 12px; }
@@ -1026,7 +1026,7 @@ body { font-size: 13px; }
 </div>
 
 <div id="stormFlash" aria-hidden="true"></div>
-<div id="stormNote" role="status" hidden>⛈️ 下午 4:10 的鏡中國度：雷雨來了！</div>
+<div id="stormNote" role="status" hidden>⛈️ 下午 4 點的鏡中國度：雷雨來了！</div>
 <div class="hud glass" id="hud" role="toolbar" aria-label="時間與顯示" data-en-label="Time and display">
   <div class="clock">
     <svg class="watch" viewBox="0 -6 40 46" aria-hidden="true">
@@ -4930,26 +4930,38 @@ function buildWalkers() {
   }
   walkers.forEach((w) => {
     const el = document.createElement('div'); el.className = 'bubble';
-    el.textContent = tr('正在搬' + w.f.d.cargoName, 'Carrying ' + w.f.d.cargoEn);
+    el.textContent = soldierName(w.suit);
     const ob = new CSS2DObject(el); ob.visible = false; scene.add(ob); w.bubble = ob;
   });
 }
 const _wv = { x: 0, z: 0 };
+// 衛兵在各島之間不停巡邏：走完一段，就挑另一座島的隨機地點接著走，不停下來
+function nextPatrol(w) {
+  const from = islandAt(w.pos);
+  let to = from;
+  while (islands.length > 1 && to === from) to = Math.floor(Math.random() * islands.length);
+  const a = nearestNode(from, w.pos), b = islands[to].nodeBase + Math.floor(Math.random() * 12);
+  const ids = dijkstra(a, b);
+  const pts = [{ x: w.pos.x, y: WALK_Y, z: w.pos.z }, ...expandPath(ids)];
+  w.route = makeRoute(pts); w.s = 0; w.dir = 1;
+  w.fromIsl = islands[from]; w.toIsl = islands[to];
+  if (w.logger) logEvent('patrol', w);
+}
 function placeWalker(w) {
-  pointAt(w.f.route, w.s, w.pos, w.tan);
+  pointAt(w.route || w.f.route, w.s, w.pos, w.tan);
   w.pos.x += -w.tan.z * w.lat; w.pos.z += w.tan.x * w.lat;
   if (w.pause <= 0) w.heading = Math.atan2(w.tan.x * w.dir, w.tan.z * w.dir);
 }
 function updateWalkers(dt) {
   for (const w of walkers) {
-    const L = w.f.route.len;
-    if (w.pause > 0) {
-      w.pause -= dt;
-      if (w.pause <= 0) { w.pause = 0; w.dir *= -1; if (w.logger) logEvent('depart', w); }
-    } else {
+    w.pause = 0;
+    if (!w.route) {
+      // 第一段：沿著原本的協作線走到一端，之後就自由巡邏
       w.s += w.dir * w.speed * dt;
-      if (w.s >= L) { w.s = L; w.pause = 1.4; if (w.logger) logEvent('handoff', w); }
-      else if (w.s <= 0) { w.s = 0; w.pause = 1.4; if (w.logger) logEvent('arrive', w); }
+      if (w.s >= w.f.route.len || w.s <= 0) { w.s = clamp(w.s, 0, w.f.route.len); placeWalker(w); nextPatrol(w); }
+    } else {
+      w.s += w.speed * dt;
+      if (w.s >= w.route.len) { w.s = w.route.len; placeWalker(w); nextPatrol(w); }
     }
     placeWalker(w);
   }
@@ -4960,7 +4972,7 @@ function drawWalkers(camDist) {
   const k = clamp(camDist / 20, 1, 1.45);
   const sc = 0.35 * k;
   const animT = simTime;
-  const showBadge = state.cargo && camDist < 16;
+  const showBadge = false;   // 頭頂不顯示搬運物
   dk.begin();
   for (const k in badgeMats) badgeMats[k].n = 0;
   const P = (kind, x, y, z, sx, sy, sz, col, rx = 0, ry = 0, rz = 0) => {
@@ -5037,7 +5049,10 @@ function logEvent(type, w) {
   const rn = soldierName(w.suit);
   const cargo = tr(f.d.cargoName, f.d.cargoEn);
   let txt;
-  if (type === 'depart') {
+  if (type === 'patrol' && w.fromIsl && w.toIsl) {
+    txt = w.fromIsl === w.toIsl ? tr(`${rn}在 ${islandLabel(w.toIsl)} 巡邏`, `${rn} patrols ${islandLabel(w.toIsl)}`)
+      : tr(`${rn}從 ${islandLabel(w.fromIsl)} 巡邏到 ${islandLabel(w.toIsl)}`, `${rn} patrols from ${islandLabel(w.fromIsl)} to ${islandLabel(w.toIsl)}`);
+  } else if (type === 'depart') {
     const from = w.dir > 0 ? f.A : f.B, to = w.dir > 0 ? f.B : f.A;
     txt = tr(`${rn}從 ${islandLabel(from)} 出發，前往 ${islandLabel(to)}`, `${rn} leaves ${islandLabel(from)} for ${islandLabel(to)}`);
   } else if (type === 'handoff') {
@@ -5045,7 +5060,7 @@ function logEvent(type, w) {
   } else {
     txt = tr(`${rn}回到 ${islandLabel(f.A)}，準備下一趟`, `${rn} is back at ${islandLabel(f.A)} for the next run`);
   }
-  const tag = { depart: tr('出發', 'DEPART'), arrive: tr('抵達', 'ARRIVE'), handoff: tr('交接', 'HANDOFF') }[type];
+  const tag = { patrol: tr('巡邏', 'PATROL'), depart: tr('出發', 'DEPART'), arrive: tr('抵達', 'ARRIVE'), handoff: tr('交接', 'HANDOFF') }[type];
   const li = document.createElement('li');
   li.dataset.flow = String(f.fi);
   li.innerHTML = `<time>${fmtTime(clockMin)}</time><span><span class="ev ${type}">${esc(tag)}</span>${esc(txt)}</span>`;
@@ -5413,7 +5428,7 @@ function flowCard(f, w) {
   const d = f.d, lv = DATA.levels[d.level] || { zh: d.level, en: d.level };
   const role = DATA.roles[d.role] || { zh: d.role, en: d.role };
   const head = w
-    ? `<p class="eyebrow">${tr('撲克牌衛兵', 'CARD GUARD')} · ${esc(w.suit)}</p><h2>${esc(tr(`這位${(SOLDIER[w.suit] || SOLDIER['♥'])[0]}正在搬${d.cargoName}`, `This ${(SOLDIER[w.suit] || SOLDIER['♥'])[1].toLowerCase()} is carrying ${d.cargoEn}`))}</h2>`
+    ? `<p class="eyebrow">${tr('撲克牌衛兵', 'CARD GUARD')} · ${esc(w.suit)}</p><h2>${esc(tr(`這位${(SOLDIER[w.suit] || SOLDIER['♥'])[0]}正在各島之間巡邏`, `This ${(SOLDIER[w.suit] || SOLDIER['♥'])[1].toLowerCase()} is patrolling the islands`))}</h2>`
     : `<p class="eyebrow">${tr('路線', 'ROUTE')} · ${esc(tr(lv.zh, lv.en))}</p><h2>${esc(tr(d.title, d.titleEn))}</h2>`;
   return `${head}
     <div class="flow-hero">
@@ -5635,10 +5650,11 @@ function pick(cx, cy) {
   _ndc.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(_ndc, camera);
   const cands = [...Object.values(dk.meshes).filter((m) => m !== dk.meshes.shadow && m.count > 0), ...mainMeshes, ...islandTopMeshes, ...flows.filter((f) => f.tube.visible).map((f) => f.tube)];
-  cands.push(...badgeGroup.children.filter((m) => m.count > 0));
+  if (alice) cands.unshift(...alice.g.children.flatMap((c) => (c.isMesh ? [c] : c.children.filter((m) => m.isMesh))));
   const hits = raycaster.intersectObjects(cands, false);
   for (const h of hits) {
     const o = h.object;
+    if (o.userData.alice) { talkAlice(); return; }
     if (o.userData.dyn !== undefined && h.instanceId !== undefined) { const wi = dk.owner[o.userData.dyn][h.instanceId]; if (wi >= 0) { selectWalker(wi); return; } }
     if (o.userData.badge !== undefined && h.instanceId !== undefined) { selectWalker(badgeMats[o.userData.badge].owner[h.instanceId]); return; }
     if (o.userData.flow !== undefined) { selectFlow(o.userData.flow); return; }
@@ -5657,16 +5673,17 @@ function pick(cx, cy) {
    主迴圈（只在需要時 render）
    ===================================================================== */
 /* =====================================================================
-   ⛈️ 午後雷雨：每天真實時間 16:10–16:20，天空變暗、下雨、打雷閃電
+   ⛈️ 午後雷雨：跟著左下角的「城市時間」，每天 16:00–17:00 天空變暗、下雨、打雷閃電
+   （城市時間 1 秒走 10 分鐘，所以這場雷雨約 6 秒；按「暫停」可以停在雷雨中慢慢看）
    預覽：在網址後面加上 ?storm=1 就會一直下雨
    ===================================================================== */
-const STORM_FROM = 16 * 60 + 10, STORM_TO = 16 * 60 + 20;
+const STORM_FROM = 16 * 60, STORM_TO = 17 * 60;
 const STORM = { level: 0, target: 0, flash: 0, flicker: [], nextBolt: 1.5, check: 0, bolt: null, boltLife: 0, rain: null, drops: null,
   force: (() => { try { return /[?&]storm=1\b/.test(location.search); } catch (e) { return false; } })() };
 let _stCol = null;
 function stormWanted() {
   if (STORM.force) return true;
-  const n = new Date(), m = n.getHours() * 60 + n.getMinutes();
+  const m = ((clockMin % 1440) + 1440) % 1440;
   return m >= STORM_FROM && m < STORM_TO;
 }
 function buildStorm() {
@@ -5708,10 +5725,11 @@ function strikeBolt() {
 }
 // 回傳 true 代表畫面需要更新
 function updateStorm(dt, animating) {
-  STORM.check -= dt;
-  if (STORM.check <= 0) { STORM.check = 1; STORM.target = stormWanted() ? 1 : 0; }
+  const wasOff = STORM.target === 0;
+  STORM.target = stormWanted() ? 1 : 0;
+  if (wasOff && STORM.target === 1) STORM.nextBolt = 0.5;   // 雷雨一來馬上先劈一道
   const before = STORM.level + STORM.flash;
-  STORM.level += clamp(STORM.target - STORM.level, -dt / 4, dt / 4);   // 約 4 秒漸變
+  STORM.level += clamp(STORM.target - STORM.level, -dt / 0.8, dt / 0.8);   // 約 0.8 秒漸變（城市的一小時只有 6 秒）
   const L = STORM.level;
   const note = $('#stormNote'); if (note) note.hidden = L < 0.35;
   if (L <= 0.001 && STORM.flash <= 0) { if (STORM.rain.visible) { STORM.rain.visible = false; STORM.bolt.visible = false; return true; } return false; }
@@ -5733,7 +5751,7 @@ function updateStorm(dt, animating) {
   // 閃電
   if (!RM && animating && L > 0.6) {
     STORM.nextBolt -= dt;
-    if (STORM.nextBolt <= 0) { strikeBolt(); STORM.nextBolt = 3 + Math.random() * 6; }
+    if (STORM.nextBolt <= 0) { strikeBolt(); STORM.nextBolt = 0.9 + Math.random() * 1.6; }
   }
   if (STORM.flicker.length) { STORM.flicker = STORM.flicker.map((x) => x - dt); if (STORM.flicker[0] <= 0) { STORM.flicker.shift(); STORM.flash = 0.85; } }
   STORM.flash = Math.max(0, STORM.flash - dt * 5);
@@ -5762,15 +5780,16 @@ function stormTint() {
 
 /* =====================================================================
    👧 愛麗絲：在各島之間走來走去，拜訪白兔、紅心皇后，去茶會吃點心、喝咖啡
-   老師可以修改 ALICE_STOPS：isl 島、at 站點（char 故事角色／decor 名稱）、
+   平常不顯示對話；點一下愛麗絲，才會冒出她（和對方角色）說的話。
+   老師可以修改 ALICE_STOPS：isl 島、at 站點（char 故事角色／decor 名稱）、go 路上被點到時說要去哪、
    say 愛麗絲說的話、reply 角色回的話、replyAt 回話的位置（預設同 at）
    ===================================================================== */
 const ALICE_STOPS = [
-  { isl: 'rabbit', at: 'char', say: '🐇 白兔先生，等等我！', reply: '⏰ 我要遲到了！我要遲到了！' },
-  { isl: 'rose', at: 'char', say: '👑 參見紅心皇后！', reply: '♥ 來人啊，砍掉她的——算了，先來打槌球！' },
-  { isl: 'hatter', at: 'teapot', say: '🍰 茶會的點心好好吃！', reply: '🎩 為什麼烏鴉像書桌？', replyAt: 'char' },
-  { isl: 'hatter', at: 'teacup', say: '☕ 來杯咖啡，提提神～', reply: '🎩 換位子！換位子！', replyAt: 'char' },
-  { isl: 'cheshire', at: 'char', say: '😸 柴郡貓，你又只剩笑容了！', reply: '我們這裡都瘋了，你也是。' }
+  { isl: 'rabbit', at: 'char', go: '去找白兔先生', say: '🐇 白兔先生，等等我！', reply: '⏰ 我要遲到了！我要遲到了！' },
+  { isl: 'rose', at: 'char', go: '去參見紅心皇后', say: '👑 參見紅心皇后！', reply: '♥ 來人啊，砍掉她的——算了，先來打槌球！' },
+  { isl: 'hatter', at: 'teapot', go: '去瘋帽子的茶會吃點心', say: '🍰 茶會的點心好好吃！', reply: '🎩 為什麼烏鴉像書桌？', replyAt: 'char' },
+  { isl: 'hatter', at: 'teacup', go: '去喝杯咖啡', say: '☕ 來杯咖啡，提提神～', reply: '🎩 換位子！換位子！', replyAt: 'char' },
+  { isl: 'cheshire', at: 'char', go: '去找柴郡貓', say: '😸 柴郡貓，你又只剩笑容了！', reply: '我們這裡都瘋了，你也是。' }
 ];
 const ALICE_RAIN = ['☔ 下雨了，快撐傘！', '⚡ 哇，打雷了！', '☔ 雨好大，先去茶會躲雨吧～'];
 let alice = null;
@@ -5801,7 +5820,8 @@ function buildAlice() {
     return Object.assign({}, st, { islI: isl.i, spot, replySpot: rs, stand: { x: spot.x + dx * 0.42, y: WALK_Y, z: spot.z + dz * 0.42 } });
   }).filter(Boolean);
   if (!stops.length) { scene.remove(g); return; }
-  alice = { g, body, umb, stops, idx: 0, route: null, s: 0, pause: 4, t: 0, pos: new THREE.Vector3(), tan: { x: 0, z: 1 }, heading: 0, rainSaid: false,
+  g.traverse((o) => { if (o.isMesh) o.userData.alice = true; });
+  alice = { g, body, umb, stops, idx: 0, route: null, s: 0, pause: 4, t: 0, pos: new THREE.Vector3(), tan: { x: 0, z: 1 }, heading: 0, talk: 0,
     say: bubble('alice'), reply: bubble('reply') };
   const st0 = stops[0];
   alice.pos.set(st0.stand.x, st0.stand.y, st0.stand.z);
@@ -5830,12 +5850,24 @@ function planAlice() {
 function arriveAlice() {
   const a = alice, st = a.stops[a.idx];
   a.pause = 5.5;
-  const rainy = STORM.level > 0.5;
-  a.say.element.textContent = st.say; a.say.visible = true;
-  a.reply.element.textContent = rainy && st.at === 'char' ? st.reply + ' ☔' : st.reply;
-  a.reply.position.set(st.replySpot.x, TOP + 0.95, st.replySpot.z); a.reply.visible = true;
   const dx = st.spot.x - a.pos.x, dz = st.spot.z - a.pos.z;
   if (Math.hypot(dx, dz) > 0.01) a.heading = Math.atan2(dx, dz);
+}
+// 點一下愛麗絲：在站點就和角色對話，走在路上就說要去哪裡（約 4 秒後消失）
+function talkAlice() {
+  const a = alice; if (!a) return;
+  const st = a.stops[a.idx], rainy = STORM.level > 0.5;
+  if (a.pause > 0) {
+    a.say.element.textContent = st.say;
+    a.reply.element.textContent = rainy && st.at === 'char' ? st.reply + ' ☔' : st.reply;
+    a.reply.position.set(st.replySpot.x, TOP + 0.95, st.replySpot.z); a.reply.visible = true;
+    a.pause = Math.max(a.pause, 4);   // 讓她多待一下，把話說完
+  } else {
+    a.say.element.textContent = rainy ? ALICE_RAIN[Math.floor(Math.random() * ALICE_RAIN.length)] : `我正要${st.go || '去散步'}！`;
+    a.reply.visible = false;
+  }
+  a.say.visible = true; a.talk = 4;
+  dirty = true;
 }
 function placeAlice() {
   const a = alice;
@@ -5847,20 +5879,18 @@ function updateAlice(dt) {
   if (!alice) return;
   const a = alice; a.t += dt;
   const rainy = STORM.level > 0.5;
+  if (a.talk > 0) { a.talk -= dt; if (a.talk <= 0) { a.say.visible = false; a.reply.visible = false; } }
   a.umb.visible = rainy;
   if (a.pause > 0) {
     a.pause -= dt;
     a.body.position.y = 0; a.body.rotation.z = Math.sin(a.t * 2) * 0.04;
-    if (a.pause <= 0) { a.say.visible = false; a.reply.visible = false; planAlice(); }
+    if (a.pause <= 0) { a.reply.visible = false; planAlice(); }
   } else {
     a.s += 0.42 * dt;
     pointAt(a.route, a.s, a.pos, a.tan);
     a.heading = Math.atan2(a.tan.x, a.tan.z);
     a.body.position.y = Math.abs(Math.sin(a.t * 9)) * 0.07;
     a.body.rotation.z = Math.sin(a.t * 9) * 0.06;
-    // 下雨時邊走邊喊一句
-    if (rainy && !a.rainSaid) { a.rainSaid = true; a.say.element.textContent = ALICE_RAIN[Math.floor(Math.random() * ALICE_RAIN.length)]; a.say.visible = true; setTimeout(() => { if (alice && alice.pause <= 0) alice.say.visible = false; }, 3000); }
-    if (!rainy) a.rainSaid = false;
     if (a.s >= a.route.len) arriveAlice();
   }
   placeAlice();
