@@ -115,10 +115,10 @@ const DATA = {
       color: '#c9b6f2', ground: { pattern: 'stripe', color: '#f1ebfd' }, tree: 'jacaranda',
       landmark: 'booktree', decor: ['mushrooms', 'signpost'],
       story: { zh: '柴郡貓的森林', en: 'The Cheshire Cat’s Wood', char: 'cheshire' },
-      summary: '兔子洞裡的國文課、柴郡貓的怪問題、樹洞裡的悄悄話，與藏在書頁裡的世界', summaryEn: 'Chinese lessons down the rabbit-hole, the Cheshire Cat’s odd questions, whispers in the tree hollow and worlds hidden in the pages',
+      summary: '樹梢上的魔法課、柴郡貓的怪問題、樹洞裡的悄悄話，與藏在書頁裡的世界', summaryEn: 'Magic lessons in the treetops, the Cheshire Cat’s odd questions, whispers in the tree hollow and worlds hidden in the pages',
       items: [
-        { id: 'c1', name: '兔子洞裡的國文課', en: 'Chinese Lessons Down the Rabbit-Hole', model: 'classroom',
-          desc: '跟著白兔跳進兔子洞，番薯老師的每一堂國文課都收在這裡。挑一扇門，往下掉吧！', descEn: 'Follow the White Rabbit down the hole: every one of Teacher Sweet Potato’s Chinese lessons is kept here. Pick a door and fall in!',
+        { id: 'c1', name: '樹梢上的魔法課', en: 'Magic Lessons in the Treetops', model: 'classroom',
+          desc: '爬上藏書樹的樹梢，番薯老師的每一堂國文課都掛在這裡，像一本本等著被施咒的魔法書。挑一堂，開始上課吧！', descEn: 'Climb to the top of the book tree: every one of Teacher Sweet Potato’s Chinese lessons hangs here like a spellbook waiting to be opened. Pick one and class begins!',
           media: {
             title: '我的課程', titleEn: 'My courses',
             items: [
@@ -146,7 +146,7 @@ const DATA = {
     { id: 'f1', from: 'rabbit', to: 'rose', cargo: 'book', cargoName: '作品', cargoEn: 'works', role: 'researcher', level: 'official',
       title: '創作收進玫瑰園', titleEn: 'Work into the rose garden', desc: '番薯老師把新的創作，從兔子洞送進紅心皇后的玫瑰園。', descEn: 'Teacher Sweet Potato carries new work from the rabbit-hole to the rose garden.' },
     { id: 'f2', from: 'hatter', to: 'cheshire', cargo: 'toolbox', cargoName: '點子', cargoEn: 'ideas', role: 'commuter', level: 'thematic',
-      title: '百寶箱到藏書樹', titleEn: 'From the chest to the book tree', desc: '百寶箱遊樂場裡玩出來的點子，送到藏書樹，變成兔子洞裡的國文課與柴郡貓的怪問題。', descEn: 'Ideas played out in the chest’s playground go to the book tree to become lessons and the Cheshire Cat’s odd questions.' },
+      title: '百寶箱到藏書樹', titleEn: 'From the chest to the book tree', desc: '百寶箱遊樂場裡玩出來的點子，送到藏書樹，變成樹梢上的魔法課與柴郡貓的怪問題。', descEn: 'Ideas played out in the chest’s playground go to the book tree to become magic lessons and the Cheshire Cat’s odd questions.' },
     { id: 'f3', from: 'cheshire', to: 'rose', cargo: 'chart', cargoName: '學習成果', cargoEn: 'learning results', role: 'student', level: 'official',
       title: '課堂成果展出', titleEn: 'Class work on display', desc: '課堂裡的學生作品，送到玫瑰園展出。', descEn: 'Student work from class goes on display in the rose garden.' }
   ],
@@ -452,6 +452,15 @@ body.side-closed .log { right: calc(16px + env(safe-area-inset-right, 0px)); }
 .pin:hover { transform: scale(1.14) rotate(-8deg); }
 .bubble { background: #fff; border-radius: 12px; padding: 3px 9px; font-size: 11px; font-weight: 600; white-space: nowrap; box-shadow: var(--chip-shadow), inset 0 0 0 1.5px rgba(185, 163, 227, .9); position: relative; transform: translateY(-4px); }
 .bubble::before { content: "… "; color: var(--cheshire); }
+.bubble.say::before { content: none; }
+.bubble.say { font-size: 12px; padding: 4px 10px; }
+.bubble.say.alice { background: #edf5fe; box-shadow: var(--chip-shadow), inset 0 0 0 1.5px #a7c7f2; color: #3a5a8c; }
+.bubble.say.reply { background: var(--paper); color: var(--rose-deep); top: -18px; }
+#stormFlash { position: fixed; inset: 0; z-index: 3; pointer-events: none; background: #f4f1ff; opacity: 0; }
+#stormNote { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 30; pointer-events: none; padding: 6px 16px; border-radius: 999px; background: rgba(59, 63, 85, .88); color: #f3f0ff; font: 800 13px/1.4 var(--sans); box-shadow: 0 4px 14px rgba(30, 30, 50, .3); white-space: nowrap; animation: stormIn .6s ease; }
+#stormNote[hidden] { display: none; }
+@keyframes stormIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (max-width: 800px) { #stormNote { top: auto; bottom: 96px; font-size: 12px; } }
 .bubble::after { content: ""; position: absolute; left: 50%; bottom: -6px; margin-left: -3px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 1.5px rgba(185, 163, 227, .9); }
 
 /* ---------- 說明：DRINK ME ---------- */
@@ -840,6 +849,26 @@ body { font-size: 13px; }
 .wx-pad { display: block; margin-top: 10px; text-align: center; text-decoration: none; padding: 10px 12px; border-radius: 14px; background: linear-gradient(120deg, var(--lilac), var(--rose-pale)); color: var(--plum); font: 800 14px/1.4 var(--serif); box-shadow: var(--chip-shadow); }
 .wx-pad:hover { filter: brightness(1.04); }
 .wx-pad small { display: block; font: 600 11.5px/1.4 var(--sans); color: var(--muted); }
+.cx-flipbox { background: var(--lilac-pale); border-radius: 14px; padding: 12px; margin-top: 10px; box-shadow: inset 0 0 0 1px var(--lilac); animation: pxRise .5s cubic-bezier(.3, 1.4, .5, 1); }
+.cx-flipbox[hidden] { display: none; }
+.cx-flip-say { margin: 0 0 8px; font-size: 13.5px; line-height: 1.7; color: var(--plum); }
+.cx-flip-say b { color: var(--rose-deep); }
+.cx-starters { display: flex; flex-wrap: wrap; gap: 5px; }
+.cx-starters button { border: 0; border-radius: 999px; padding: 5px 10px; font: 700 12px/1.3 var(--sans); background: #fff; color: #3f3245; cursor: pointer; box-shadow: var(--chip-shadow); }
+.cx-starters button:hover { background: var(--rose-pale); }
+.cx-flipbox textarea { width: 100%; min-height: 90px; margin-top: 8px; box-sizing: border-box; resize: vertical; border: 0; border-radius: 12px; padding: 10px 12px; font: 500 15px/1.75 var(--serif); color: #3f3245; background: #fff; box-shadow: inset 0 0 0 1.5px var(--lilac); }
+.cx-flipbox textarea:focus { outline: none; box-shadow: inset 0 0 0 2px var(--rose); }
+.cx-flip-msg { min-height: 16px; margin: 6px 0 0; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--rose-deep); }
+.cx-card { margin-top: 10px; border-radius: 16px; padding: 14px; background: linear-gradient(150deg, var(--lilac-pale), var(--rose-pale)); box-shadow: var(--gold-frame), var(--card-shadow); animation: pxRise .6s cubic-bezier(.3, 1.4, .5, 1); }
+.cx-card .hd { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 800; color: var(--plum-2); letter-spacing: .06em; }
+.cx-card .hd span:last-child { color: var(--rose-deep); }
+.cx-card .q { font: 900 17px/1.55 var(--serif); color: var(--plum); margin: 8px 0 10px; }
+.cx-card .cx-side { background: #fff; border-radius: 12px; padding: 9px 11px; margin-bottom: 8px; font: 700 14.5px/1.65 var(--serif); color: #3f3245; box-shadow: inset 0 0 0 1.5px var(--lilac); }
+.cx-card .cx-side.b { background: var(--gold-pale); box-shadow: inset 0 0 0 1.5px var(--gold); }
+.cx-card .cx-side b { display: block; font: 800 11.5px/1.4 var(--sans); color: var(--plum-2); margin-bottom: 2px; }
+.cx-card .cx-side.b b { color: var(--rose-deep); }
+.cx-card .cx-side small { display: block; font: 500 11.5px/1.55 var(--sans); color: var(--muted); margin-top: 4px; }
+.cx-card .nx { font-size: 12.5px; line-height: 1.6; color: var(--plum); }
 .cx-other { margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed var(--lilac); }
 .cx-other h4 { margin: 0 0 2px; font: 900 15px/1.4 var(--serif); color: var(--rose-deep); }
 .cx-other blockquote { border-left-color: var(--rose); background: var(--rose-pale); }
@@ -996,6 +1025,8 @@ body { font-size: 13px; }
   <div><svg class="line-sample" viewBox="0 0 34 8"><line x1="2" y1="4" x2="33" y2="4" stroke="#f27a9a" stroke-width="3" stroke-dasharray="0.1 6" stroke-linecap="round"/></svg><span id="lgPending">待確認</span></div>
 </div>
 
+<div id="stormFlash" aria-hidden="true"></div>
+<div id="stormNote" role="status" hidden>⛈️ 下午 4:10 的鏡中國度：雷雨來了！</div>
 <div class="hud glass" id="hud" role="toolbar" aria-label="時間與顯示" data-en-label="Time and display">
   <div class="clock">
     <svg class="watch" viewBox="0 -6 40 46" aria-hidden="true">
@@ -1906,6 +1937,7 @@ window.GAMES = Object.assign(window.GAMES || {}, { rabbit: window.RabbitGame });
      opts 直覺選項：t 選項文字、v 對應到 voices 的第幾位（從 0 算）、quip 柴郡貓的吐槽
      voices 古人怎麼想：who 人物、work 出處、line 原文、say 白話解說
      next 柴郡貓的追問（帶回生活的思辨）
+   回答後可以玩「🔄 換邊站挑戰」：替反方說一句話，生成一張可下載的思辨卡。
    ================================================================ */
 const ODDQ_TYPES = [
   { k: 'moral', ic: '⚖️', name: '是非顛倒題', sub: '對與錯，真的分得那麼清楚嗎？', skill: '價值判斷' },
@@ -2047,7 +2079,9 @@ window.OddQGame = (() => {
     get(k, d) { try { const v = localStorage.getItem('oddq:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('oddq:' + k, JSON.stringify(v)); } catch (e) { /* 私密模式等情況忽略 */ } }
   };
-  let memSeen = null;
+  let memSeen = null, memBadge = null;
+  const FLIP_STARTERS = ['如果站在對方的角度，……', '雖然我原本覺得……，但是……', '對方可能會問我：……', '也許真正的問題不是……，而是……'];
+  const addBadge = () => { memBadge = (memBadge != null ? memBadge : store.get('badge', 0)) + 1; store.set('badge', memBadge); return memBadge; };
   const seen = () => memSeen || (memSeen = store.get('seen', []));
   const markSeen = (i) => { const v = seen(); if (!v.includes(i)) { v.push(i); store.set('seen', v); } };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -2093,7 +2127,7 @@ window.OddQGame = (() => {
     function reveal(j) {
       const x = ODDQ[cur], o = x.opts[j], t = typeOf(x.type), mine = x.voices[o.v];
       const first = !seen().includes(cur); markSeen(cur);
-      const others = x.voices.filter((v, k) => k !== o.v);
+      const others = x.voices.filter((v, k) => k !== o.v), rival = others[0] || mine;
       root.innerHTML = `
         <p class="cx-msg">${esc(o.quip)}</p>
         <div class="cx-q"><div class="k">${t.ic} ${esc(t.name)} · 你的直覺：${esc(o.t)}</div><div class="main">${esc(x.q)}</div></div>
@@ -2115,19 +2149,91 @@ window.OddQGame = (() => {
         <div class="cx-row">
           <button class="btn" type="button" data-cx="again">🎲 再來一個${type ? esc(t.name) : '怪問題'}</button>
           <button class="btn" type="button" data-cx="menu">↩ 換一種怪問題</button>
-          <button class="btn cx-main" type="button" data-cx="whisper">🌳 把我的看法說給樹洞聽</button>
+          <button class="btn cx-main" type="button" data-cx="flip">🔄 換邊站挑戰</button>
         </div>
+        <div class="cx-flipbox" data-cx="flipbox" hidden>
+          <p class="cx-flip-say">😸 柴郡貓把你的椅子轉了一百八十度：「現在換你替 <b>${esc(rival.who)}</b> 說話。用一兩句話，說服原本的自己。」</p>
+          <div class="cx-starters">${FLIP_STARTERS.map((t) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+          <textarea data-cx="flipText" maxlength="200" placeholder="例如：如果站在${esc(rival.who)}的角度，……"></textarea>
+          <div class="cx-row"><button class="btn cx-main" type="button" data-cx="makeCard">✨ 完成思辨卡</button></div>
+          <p class="cx-flip-msg" data-cx="flipMsg"></p>
+        </div>
+        <div data-cx="cardOut"></div>
         ${trail()}`;
       root.querySelector('[data-cx="again"]').onclick = () => ask(pick(type));
       root.querySelector('[data-cx="menu"]').onclick = menu;
-      root.querySelector('[data-cx="whisper"]').onclick = () => {
-        // 把這次的怪問題交給「樹洞裡的悄悄話」，自動帶入草稿
-        window.WHISPER_HANDOFF = { kind: 'ask', text: `柴郡貓的怪問題：${x.q}\n我的直覺是「${o.t}」，和${mine.who}站在同一邊。\n柴郡貓追問：${x.next}\n我的看法：` };
-        const el = document.querySelector('[data-item="c3"]');
-        if (el) el.click(); else window.open(window.WHISPER_PADLET, '_blank', 'noopener');
+      // 🔄 換邊站挑戰：替反方說一句話 → 生成可下載的「思辨卡」
+      const fq = (k) => root.querySelector(`[data-cx="${k}"]`);
+      fq('flip').onclick = () => { const b = fq('flipbox'); b.hidden = !b.hidden; if (!b.hidden) { fq('flipText').focus(); b.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } };
+      root.querySelectorAll('[data-start]').forEach((b) => { b.onclick = () => { const ta = fq('flipText'); ta.value = b.dataset.start; ta.focus(); }; });
+      fq('makeCard').onclick = () => {
+        const txt = fq('flipText').value.trim();
+        if ([...txt.replace(/\s/g, '')].length < 8) { fq('flipMsg').textContent = '柴郡貓搖搖尾巴：「再多說一點，對方還沒被你說服喔。」'; return; }
+        const n = addBadge();
+        const card = { q: x.q, type: t.name, gut: o.t, mine: mine.who, mineLine: mine.line, rival: rival.who, rivalLine: rival.line, flip: txt, next: x.next };
+        fq('flipbox').hidden = true;
+        fq('cardOut').innerHTML = `
+          <div class="cx-card">
+            <div class="hd"><span>♠ 柴郡貓的思辨卡</span><span>🏅 思辨徽章 ×${n}</span></div>
+            <div class="q">${esc(card.q)}</div>
+            <div class="cx-side a"><b>我的直覺</b>${esc(card.gut)}<small>和 ${esc(card.mine)} 同一邊：「${esc(card.mineLine)}」</small></div>
+            <div class="cx-side b"><b>換邊站：替 ${esc(card.rival)} 說話</b>${esc(card.flip)}<small>${esc(card.rival)}：「${esc(card.rivalLine)}」</small></div>
+            <div class="nx">🐾 ${esc(card.next)}</div>
+          </div>
+          <div class="cx-row">
+            <button class="btn cx-main" type="button" data-cx="dl">📥 下載思辨卡</button>
+            <button class="btn" type="button" data-cx="cp">📋 複製文字</button>
+          </div>`;
+        fq('dl').onclick = () => downloadCard(card, n);
+        fq('cp').onclick = () => copyCard(card, fq('cp'));
+        fq('cardOut').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (n % 5 === 0) confetti();
       };
       if (first && seen().length === ODDQ.length) confetti();
       root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function copyCard(c, btn) {
+      const t = `【柴郡貓的思辨卡】\n問題：${c.q}\n我的直覺：${c.gut}（和${c.mine}同一邊）\n換邊站，替${c.rival}說話：${c.flip}\n柴郡貓追問：${c.next}`;
+      const ok = () => { btn.textContent = '✅ 已複製'; };
+      const fb = () => { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); ok(); } catch (e) { btn.textContent = '複製失敗'; } a.remove(); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fb); else fb();
+    }
+    // 用 canvas 畫一張 1080×1350 的思辨卡，讓學生存成圖片
+    function downloadCard(c, n) {
+      const W = 1080, H = 1350, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      const g = cv.getContext('2d');
+      const serif = '"Noto Serif TC", "Songti TC", "PMingLiU", serif', sans = '"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+      const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#f7f2ff'); bg.addColorStop(1, '#ffe8f0');
+      g.fillStyle = bg; g.fillRect(0, 0, W, H);
+      g.strokeStyle = '#ecc77a'; g.lineWidth = 6; g.strokeRect(36, 36, W - 72, H - 72);
+      g.strokeStyle = '#d6c9f7'; g.lineWidth = 2; g.strokeRect(52, 52, W - 104, H - 104);
+      const wrap = (text, x, y, maxW, lh, font, color, maxLines = 6) => {
+        g.font = font; g.fillStyle = color; let line = '', lines = 0;
+        for (const ch of [...text]) {
+          if (ch === '\n' || (g.measureText(line + ch).width > maxW && !/[，。、；：！？」』）,.!?]/.test(ch))) { g.fillText(line, x, y); y += lh; line = ch === '\n' ? '' : ch; if (++lines >= maxLines) return y; }
+          else line += ch;
+        }
+        if (line) { g.fillText(line, x, y); y += lh; }
+        return y;
+      };
+      const box = (x, y, w, h, fill, stroke) => { g.fillStyle = fill; g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, 28) : g.rect(x, y, w, h); g.fill(); if (stroke) { g.strokeStyle = stroke; g.lineWidth = 3; g.stroke(); } };
+      g.textBaseline = 'top';
+      g.font = `800 34px ${sans}`; g.fillStyle = '#a084c4'; g.fillText('♠ 柴郡貓的思辨卡 · ' + c.type, 100, 100);
+      g.textAlign = 'right'; g.fillStyle = '#d95f82'; g.fillText('🏅 ×' + n, W - 100, 100); g.textAlign = 'left';
+      let y = wrap(c.q, 100, 175, W - 200, 66, `900 50px ${serif}`, '#6b4c6e', 4) + 30;
+      const side = (label, body, foot, fill, stroke, labelCol) => {
+        const top = y; g.save(); g.globalAlpha = 0; let yy = wrap(body, 140, top + 90, W - 280, 52, `700 38px ${serif}`, '#000', 5); yy = wrap(foot, 140, yy + 10, W - 280, 40, `500 28px ${sans}`, '#000', 3); g.restore();
+        box(100, top, W - 200, yy - top + 30, fill, stroke);
+        g.font = `800 30px ${sans}`; g.fillStyle = labelCol; g.fillText(label, 140, top + 36);
+        let y2 = wrap(body, 140, top + 90, W - 280, 52, `700 38px ${serif}`, '#3f3245', 5);
+        wrap(foot, 140, y2 + 10, W - 280, 40, `500 28px ${sans}`, '#a08aa3', 3);
+        y = yy + 60;
+      };
+      side('我的直覺', c.gut, `和 ${c.mine} 同一邊：「${c.mineLine}」`, '#ffffff', '#d6c9f7', '#a084c4');
+      side(`換邊站：替 ${c.rival} 說話`, c.flip, `${c.rival}：「${c.rivalLine}」`, '#fff4d6', '#ecc77a', '#d95f82');
+      wrap('🐾 柴郡貓追問：' + c.next, 100, Math.min(y, H - 260), W - 200, 46, `700 32px ${sans}`, '#6b4c6e', 3);
+      g.font = `600 26px ${sans}`; g.fillStyle = '#a08aa3'; g.textAlign = 'center'; g.fillText('鏡中番薯的國文世界 · 柴郡貓的藏書樹', W / 2, H - 110);
+      const a = document.createElement('a'); a.download = '柴郡貓的思辨卡.png'; a.href = cv.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
     }
     function confetti(n = 22) {
       const e = ['😸', '🌙', '📜', '🐟', '✨', '♠'];
@@ -2598,6 +2704,8 @@ async function init() {
   buildGraph();
   buildFlows();
   buildWalkers();
+  buildAlice();
+  buildStorm();
   setProgress(0.86); await tick();
   buildLabels();
   buildUI();
@@ -2823,6 +2931,7 @@ function applyDayNight(force) {
   mountains.forEach((m) => m.material.color.copy(m.userData.base).lerp(d.hor, m.userData.mix));
   if (cloudMesh) cloudMesh.material.color.setRGB(1, 1, 1).lerp(d.hor, 0.25 + d.night * 0.35);
   if (lowCloudMesh) { lowCloudMesh.material.color.setRGB(1, 1, 1).lerp(d.hor, d.night * 0.55); lowCloudMesh.material.emissiveIntensity = 0.4 * (1 - d.night * 0.8); }
+  if (STORM.rain) stormTint();
   // 太陽方位：先量化到 10 分鐘
   const q = Math.floor(clockMin / 10) * 10;
   if (force || q !== lastSunQ) {
@@ -4408,7 +4517,8 @@ function buildCityModels() {
       isl.items.push(rec); itemById[it.id] = rec; allItems.push(rec);
     });
     // 裝飾場景（點了會選到整座島）
-    decor.forEach((m) => { const p = cands[cell++]; if (p) place(m, p.x, p.z, s * 0.86, (rng() - 0.5) * 0.5, null); });
+    isl.spots = {};
+    decor.forEach((m) => { const p = cands[cell++]; if (p) { const r = place(m, p.x, p.z, s * 0.86, (rng() - 0.5) * 0.5, null); isl.spots[m] = { x: r.wx, z: r.wz }; } });
     kit.owner = null;
     // 故事角色：站在小台座上
     if (hasChar) {
@@ -4419,6 +4529,7 @@ function buildCityModels() {
       kit.frame(cx, TOP + 0.06 * cs, cz, cs, cry);
       CHARS[st.char](kit.add);
       spillSpots.push({ x: cx, z: cz, r: 0.35 });
+      isl.spots.char = { x: cx, z: cz };
     }
     buildIslandDressing(isl, rng);
   });
@@ -5545,6 +5656,216 @@ function pick(cx, cy) {
 /* =====================================================================
    主迴圈（只在需要時 render）
    ===================================================================== */
+/* =====================================================================
+   ⛈️ 午後雷雨：每天真實時間 16:10–16:20，天空變暗、下雨、打雷閃電
+   預覽：在網址後面加上 ?storm=1 就會一直下雨
+   ===================================================================== */
+const STORM_FROM = 16 * 60 + 10, STORM_TO = 16 * 60 + 20;
+const STORM = { level: 0, target: 0, flash: 0, flicker: [], nextBolt: 1.5, check: 0, bolt: null, boltLife: 0, rain: null, drops: null,
+  force: (() => { try { return /[?&]storm=1\b/.test(location.search); } catch (e) { return false; } })() };
+let _stCol = null;
+function stormWanted() {
+  if (STORM.force) return true;
+  const n = new Date(), m = n.getHours() * 60 + n.getMinutes();
+  return m >= STORM_FROM && m < STORM_TO;
+}
+function buildStorm() {
+  const N = isMobile ? 650 : 1500;
+  const pos = new Float32Array(N * 6);
+  STORM.drops = { n: N, x: new Float32Array(N), y: new Float32Array(N), z: new Float32Array(N), v: new Float32Array(N) };
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+  const m = new THREE.LineBasicMaterial({ color: 0xdfe6f5, transparent: true, opacity: 0, depthWrite: false, fog: false });
+  STORM.rain = new THREE.LineSegments(g, m); STORM.rain.frustumCulled = false; STORM.rain.visible = false; STORM.rain.renderOrder = 6;
+  scene.add(STORM.rain);
+  for (let i = 0; i < N; i++) respawnDrop(i, true);
+  const bm = new THREE.MeshBasicMaterial({ color: 0xf6f2ff, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  STORM.bolt = new THREE.Mesh(new THREE.BufferGeometry(), bm); STORM.bolt.visible = false; STORM.bolt.renderOrder = 7; STORM.bolt.frustumCulled = false;
+  scene.add(STORM.bolt);
+  STORM.target = stormWanted() ? 1 : 0; STORM.level = STORM.target;
+}
+function respawnDrop(i, anyHeight) {
+  const d = STORM.drops, t = controls ? controls.target : { x: CENTER.x, z: CENTER.z };
+  d.x[i] = t.x + (Math.random() - 0.5) * 34; d.z[i] = t.z + (Math.random() - 0.5) * 34;
+  d.y[i] = anyHeight ? Math.random() * 16 : 14 + Math.random() * 3; d.v[i] = 13 + Math.random() * 6;
+}
+function strikeBolt() {
+  // 從雲裡劈到某座島附近的閃電（折線 → 細管子）
+  const isl = islands[Math.floor(Math.random() * islands.length)];
+  const ex = isl.x + (Math.random() - 0.5) * 6, ez = isl.z - 2 - Math.random() * 6;
+  let x = ex + (Math.random() - 0.5) * 4, z = ez + (Math.random() - 0.5) * 2;
+  const path = new THREE.CurvePath(); let prev = new THREE.Vector3(x, 17, z);
+  for (let k = 1; k <= 9; k++) {
+    const y = 17 - (17 - TOP) * (k / 9);
+    x = lerp(x, ex, 0.35) + (Math.random() - 0.5) * 1.3; z = lerp(z, ez, 0.35) + (Math.random() - 0.5) * 0.6;
+    const p = new THREE.Vector3(x, y, z); path.add(new THREE.LineCurve3(prev, p)); prev = p;
+  }
+  STORM.bolt.geometry.dispose();
+  STORM.bolt.geometry = new THREE.TubeGeometry(path, 36, 0.07, 5, false);
+  STORM.bolt.visible = true; STORM.boltLife = 0.38;
+  STORM.flash = 1; STORM.flicker = [0.12, 0.22];
+  const delay = 500 + Math.random() * 1200;
+  setTimeout(() => { try { Music.thunder(0.7 + Math.random() * 0.3); } catch (e) { /* 沒開音樂就不打雷聲 */ } }, delay);
+}
+// 回傳 true 代表畫面需要更新
+function updateStorm(dt, animating) {
+  STORM.check -= dt;
+  if (STORM.check <= 0) { STORM.check = 1; STORM.target = stormWanted() ? 1 : 0; }
+  const before = STORM.level + STORM.flash;
+  STORM.level += clamp(STORM.target - STORM.level, -dt / 4, dt / 4);   // 約 4 秒漸變
+  const L = STORM.level;
+  const note = $('#stormNote'); if (note) note.hidden = L < 0.35;
+  if (L <= 0.001 && STORM.flash <= 0) { if (STORM.rain.visible) { STORM.rain.visible = false; STORM.bolt.visible = false; return true; } return false; }
+  // 雨
+  const rainOn = L > 0.02 && !RM;
+  STORM.rain.visible = rainOn;
+  STORM.rain.material.opacity = 0.5 * L;
+  if (rainOn && animating) {
+    const d = STORM.drops, a = STORM.rain.geometry.attributes.position.array, t = controls.target;
+    for (let i = 0; i < d.n; i++) {
+      d.y[i] -= d.v[i] * dt; d.x[i] += 1.2 * dt;
+      if (d.y[i] < WATER_Y || Math.abs(d.x[i] - t.x) > 17 || Math.abs(d.z[i] - t.z) > 17) respawnDrop(i, false);
+      const j = i * 6;
+      a[j] = d.x[i]; a[j + 1] = d.y[i]; a[j + 2] = d.z[i];
+      a[j + 3] = d.x[i] - 0.06; a[j + 4] = d.y[i] + 0.55; a[j + 5] = d.z[i];
+    }
+    STORM.rain.geometry.attributes.position.needsUpdate = true;
+  }
+  // 閃電
+  if (!RM && animating && L > 0.6) {
+    STORM.nextBolt -= dt;
+    if (STORM.nextBolt <= 0) { strikeBolt(); STORM.nextBolt = 3 + Math.random() * 6; }
+  }
+  if (STORM.flicker.length) { STORM.flicker = STORM.flicker.map((x) => x - dt); if (STORM.flicker[0] <= 0) { STORM.flicker.shift(); STORM.flash = 0.85; } }
+  STORM.flash = Math.max(0, STORM.flash - dt * 5);
+  STORM.boltLife -= dt;
+  STORM.bolt.visible = STORM.boltLife > 0;
+  STORM.bolt.material.opacity = clamp(STORM.boltLife / 0.38, 0, 1) * (0.6 + 0.4 * Math.random());
+  const fl = $('#stormFlash'); if (fl) fl.style.opacity = String(STORM.flash * 0.32);
+  return animating || Math.abs(STORM.level + STORM.flash - before) > 1e-4;
+}
+// 在 applyDayNight 之後把天色壓暗（每次都從原本的日夜顏色重算，不會累積）
+function stormTint() {
+  const L = STORM.level, F = STORM.flash;
+  if (L <= 0.001 && F <= 0.001) return;
+  if (!_stCol) _stCol = { top: new THREE.Color('#3b3f55'), hor: new THREE.Color('#6f7386'), white: new THREE.Color('#f3f0ff'), water: new THREE.Color('#566278'), cloud: new THREE.Color('#545869'), low: new THREE.Color('#6a6e80'), hs: new THREE.Color('#aeb6c8') };
+  skyU.uTop.value.lerp(_stCol.top, L * 0.85).lerp(_stCol.white, F * 0.6);
+  skyU.uHorizon.value.lerp(_stCol.hor, L * 0.8).lerp(_stCol.white, F * 0.45);
+  scene.fog.color.copy(skyU.uHorizon.value);
+  sun.intensity *= 1 - 0.78 * L;
+  hemi.color.lerp(_stCol.hs, L * 0.6);
+  hemi.intensity = hemi.intensity * (1 - 0.3 * L) + F * 1.8;
+  waterU.uShallow.value.lerp(_stCol.water, L * 0.6);
+  waterU.uDeep.value.lerp(_stCol.water, L * 0.5).multiplyScalar(1 - 0.2 * L);
+  if (cloudMesh) cloudMesh.material.color.lerp(_stCol.cloud, L * 0.85).lerp(_stCol.white, F * 0.5);
+  if (lowCloudMesh) { lowCloudMesh.material.color.lerp(_stCol.low, L * 0.8).lerp(_stCol.white, F * 0.5); lowCloudMesh.material.emissiveIntensity *= 1 - 0.75 * L; }
+}
+
+/* =====================================================================
+   👧 愛麗絲：在各島之間走來走去，拜訪白兔、紅心皇后，去茶會吃點心、喝咖啡
+   老師可以修改 ALICE_STOPS：isl 島、at 站點（char 故事角色／decor 名稱）、
+   say 愛麗絲說的話、reply 角色回的話、replyAt 回話的位置（預設同 at）
+   ===================================================================== */
+const ALICE_STOPS = [
+  { isl: 'rabbit', at: 'char', say: '🐇 白兔先生，等等我！', reply: '⏰ 我要遲到了！我要遲到了！' },
+  { isl: 'rose', at: 'char', say: '👑 參見紅心皇后！', reply: '♥ 來人啊，砍掉她的——算了，先來打槌球！' },
+  { isl: 'hatter', at: 'teapot', say: '🍰 茶會的點心好好吃！', reply: '🎩 為什麼烏鴉像書桌？', replyAt: 'char' },
+  { isl: 'hatter', at: 'teacup', say: '☕ 來杯咖啡，提提神～', reply: '🎩 換位子！換位子！', replyAt: 'char' },
+  { isl: 'cheshire', at: 'char', say: '😸 柴郡貓，你又只剩笑容了！', reply: '我們這裡都瘋了，你也是。' }
+];
+const ALICE_RAIN = ['☔ 下雨了，快撐傘！', '⚡ 哇，打雷了！', '☔ 雨好大，先去茶會躲雨吧～'];
+let alice = null;
+function buildAlice() {
+  const mats = new Map();
+  const mat = (c) => { const k = new THREE.Color(c).getHexString(); if (!mats.has(k)) mats.set(k, new THREE.MeshStandardMaterial({ color: new THREE.Color(c), roughness: 0.72 })); return mats.get(k); };
+  const adder = (parent) => (kind, x, y, z, w, h, d, color, ry = 0, rx = 0, rz = 0) => {
+    const m = new THREE.Mesh(GEO[kind] || GEO.box, mat(color));
+    m.position.set(x, y, z); m.rotation.set(rx, ry, rz, 'YXZ'); m.scale.set(w, h, d); m.castShadow = true;
+    parent.add(m);
+  };
+  const g = new THREE.Group(), body = new THREE.Group(), umb = new THREE.Group();
+  CHARS.alice(adder(body));
+  const u = adder(umb);
+  u('cyl', 0.24, 0.22, 0.06, 0.025, 0.95, 0.025, '#5a3d5c');
+  u('cone', 0.24, 1.0, 0.06, 1.0, 0.3, 1.0, '#f27a9a');
+  u('sphere', 0.24, 1.28, 0.06, 0.06, 0.06, 0.06, '#ecc77a');
+  umb.visible = false; body.add(umb);
+  g.add(body); g.scale.setScalar(0.52); scene.add(g);
+  const bubble = (cls) => { const el = document.createElement('div'); el.className = 'bubble say ' + cls; const ob = new CSS2DObject(el); ob.visible = false; scene.add(ob); return ob; };
+  const stops = ALICE_STOPS.map((st) => {
+    const isl = islandById[st.isl]; if (!isl || !isl.spots) return null;
+    const spot = isl.spots[st.at] || isl.spots.char; if (!spot) return null;
+    const rs = isl.spots[st.replyAt || st.at] || spot;
+    // 停在角色前面一點點（往島中心的方向）
+    let dx = isl.x - spot.x, dz = isl.z - spot.z; const l = Math.hypot(dx, dz);
+    if (l < 0.1) { dx = 0; dz = 1; } else { dx /= l; dz /= l; }
+    return Object.assign({}, st, { islI: isl.i, spot, replySpot: rs, stand: { x: spot.x + dx * 0.42, y: WALK_Y, z: spot.z + dz * 0.42 } });
+  }).filter(Boolean);
+  if (!stops.length) { scene.remove(g); return; }
+  alice = { g, body, umb, stops, idx: 0, route: null, s: 0, pause: 4, t: 0, pos: new THREE.Vector3(), tan: { x: 0, z: 1 }, heading: 0, rainSaid: false,
+    say: bubble('alice'), reply: bubble('reply') };
+  const st0 = stops[0];
+  alice.pos.set(st0.stand.x, st0.stand.y, st0.stand.z);
+  arriveAlice();
+  placeAlice();
+}
+function nearestNode(islI, p) {
+  let best = -1, bd = Infinity;
+  for (let k = 0; k < 12; k++) { const i = islands[islI].nodeBase + k, n = nodes[i], d = Math.hypot(n.x - p.x, n.z - p.z); if (d < bd) { bd = d; best = i; } }
+  return best;
+}
+function islandAt(p) {
+  let best = 0, bd = Infinity;
+  islands.forEach((isl, i) => { const d = Math.hypot(isl.x - p.x, isl.z - p.z); if (d < bd) { bd = d; best = i; } });
+  return best;
+}
+function planAlice() {
+  const a = alice, from = { x: a.pos.x, y: WALK_Y, z: a.pos.z };
+  a.idx = (a.idx + 1) % a.stops.length;
+  const st = a.stops[a.idx], i0 = islandAt(from);
+  let pts;
+  if (i0 === st.islI) pts = [from, st.stand];
+  else pts = [from, ...expandPath(dijkstra(nearestNode(i0, from), nearestNode(st.islI, st.stand))), st.stand];
+  a.route = makeRoute(pts); a.s = 0;
+}
+function arriveAlice() {
+  const a = alice, st = a.stops[a.idx];
+  a.pause = 5.5;
+  const rainy = STORM.level > 0.5;
+  a.say.element.textContent = st.say; a.say.visible = true;
+  a.reply.element.textContent = rainy && st.at === 'char' ? st.reply + ' ☔' : st.reply;
+  a.reply.position.set(st.replySpot.x, TOP + 0.95, st.replySpot.z); a.reply.visible = true;
+  const dx = st.spot.x - a.pos.x, dz = st.spot.z - a.pos.z;
+  if (Math.hypot(dx, dz) > 0.01) a.heading = Math.atan2(dx, dz);
+}
+function placeAlice() {
+  const a = alice;
+  a.g.position.copy(a.pos);
+  a.g.rotation.y = a.heading;
+  a.say.position.set(a.pos.x, a.pos.y + 0.66, a.pos.z);
+}
+function updateAlice(dt) {
+  if (!alice) return;
+  const a = alice; a.t += dt;
+  const rainy = STORM.level > 0.5;
+  a.umb.visible = rainy;
+  if (a.pause > 0) {
+    a.pause -= dt;
+    a.body.position.y = 0; a.body.rotation.z = Math.sin(a.t * 2) * 0.04;
+    if (a.pause <= 0) { a.say.visible = false; a.reply.visible = false; planAlice(); }
+  } else {
+    a.s += 0.42 * dt;
+    pointAt(a.route, a.s, a.pos, a.tan);
+    a.heading = Math.atan2(a.tan.x, a.tan.z);
+    a.body.position.y = Math.abs(Math.sin(a.t * 9)) * 0.07;
+    a.body.rotation.z = Math.sin(a.t * 9) * 0.06;
+    // 下雨時邊走邊喊一句
+    if (rainy && !a.rainSaid) { a.rainSaid = true; a.say.element.textContent = ALICE_RAIN[Math.floor(Math.random() * ALICE_RAIN.length)]; a.say.visible = true; setTimeout(() => { if (alice && alice.pause <= 0) alice.say.visible = false; }, 3000); }
+    if (!rainy) a.rainSaid = false;
+    if (a.s >= a.route.len) arriveAlice();
+  }
+  placeAlice();
+}
+
 let lastNow = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
@@ -5556,11 +5877,13 @@ function loop(now) {
     clockMin = (clockMin + dt * 10) % 1440;
     applyDayNight(false);
     updateWalkers(dt);
+    updateAlice(dt);
     updateClouds(dt);
     waterU.uTime.value = simTime;
     flowTimeU.value = simTime;
     dirty = true;
   }
+  if (updateStorm(dt, animating)) { if (!animating) applyDayNight(false); dirty = true; }
   if (flight) {
     const k = clamp((now - flight.start) / flight.dur, 0, 1), e = easeInOutCubic(k);
     camera.position.lerpVectors(flight.p0, flight.p1, e);
@@ -5686,6 +6009,18 @@ const Music = (() => {
       master.gain.setValueAtTime(master.gain.value, t);
       master.gain.linearRampToValueAtTime(0, t + 0.6);
       setTimeout(() => { if (!on && ctx) ctx.suspend(); }, 700);
+    },
+    // ⛈️ 雷聲：棕噪音＋低通濾波（只有在音樂開著時才會響）
+    thunder(k = 1) {
+      if (!on || !ctx) return;
+      const t = ctx.currentTime, len = 2.6, sr = ctx.sampleRate;
+      const buf = ctx.createBuffer(1, Math.floor(sr * len), sr), d = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < d.length; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(520, t); lp.frequency.exponentialRampToValueAtTime(110, t + len);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(1.1 * k, t + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+      src.connect(lp); lp.connect(g); g.connect(ctx.destination); src.start(t); src.stop(t + len);
     },
     pause() { if (ctx && on) ctx.suspend(); },
     resume() { if (ctx && on) ctx.resume(); },
