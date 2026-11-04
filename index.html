@@ -115,7 +115,7 @@ const DATA = {
       color: '#c9b6f2', ground: { pattern: 'stripe', color: '#f1ebfd' }, tree: 'jacaranda',
       landmark: 'booktree', decor: ['mushrooms', 'signpost'],
       story: { zh: '柴郡貓的森林', en: 'The Cheshire Cat’s Wood', char: 'cheshire' },
-      summary: '兔子洞裡的國文課、柴郡貓的文學岔路，與樹洞裡的悄悄話', summaryEn: 'Chinese lessons down the rabbit-hole, the Cheshire Cat’s literary crossroads and whispers in the tree hollow',
+      summary: '兔子洞裡的國文課、柴郡貓的怪問題、樹洞裡的悄悄話，與藏在書頁裡的世界', summaryEn: 'Chinese lessons down the rabbit-hole, the Cheshire Cat’s odd questions, whispers in the tree hollow and worlds hidden in the pages',
       items: [
         { id: 'c1', name: '兔子洞裡的國文課', en: 'Chinese Lessons Down the Rabbit-Hole', model: 'classroom',
           desc: '跟著白兔跳進兔子洞，番薯老師的每一堂國文課都收在這裡。挑一扇門，往下掉吧！', descEn: 'Follow the White Rabbit down the hole: every one of Teacher Sweet Potato’s Chinese lessons is kept here. Pick a door and fall in!',
@@ -128,26 +128,30 @@ const DATA = {
               { title: '我的大文豪', titleEn: 'My Great Writers', image: 'cover:writers', url: 'https://padlet.com/tea752/114-2-45ue2z8a4xv99n0j' }
             ]
           } },
-        // game: 'crossroads' → 「柴郡貓的文學岔路」（題目與路線在 CROSSROADS，程式在 CrossroadsGame）
-        { id: 'c2', name: '柴郡貓的文學岔路', en: 'The Cheshire Cat’s Literary Crossroads', model: 'lectern', game: 'crossroads',
-          desc: '「你要往哪裡走？」「那要看你想去哪裡。」從生活裡的一個問題出發，選一條路走下去，在路的盡頭遇見意想不到的文學作品。',
-          descEn: '“Which way should I go?” “That depends on where you want to get to.” Start from an everyday question, choose a path, and meet an unexpected work of literature at its end (in Chinese).' },
+        // game: 'oddq' → 「柴郡貓的怪問題」（四種類型在 ODDQ_TYPES，題目在 ODDQ，程式在 OddQGame）
+        { id: 'c2', name: '柴郡貓的怪問題', en: 'The Cheshire Cat’s Odd Questions', model: 'lectern', game: 'oddq',
+          desc: '柴郡貓咧嘴一笑，丟給你一個奇怪、好笑，卻值得認真想的問題。先憑直覺選，再揭曉：原來兩千年前的哲學家、文學家，也吵過一樣的問題。',
+          descEn: 'The Cheshire Cat grins and tosses you an odd, funny question that is worth real thought. Answer on instinct, then discover that philosophers and writers argued about the same thing two thousand years ago (in Chinese).' },
         // game: 'whisper' → 「樹洞裡的悄悄話」（提示語在 WHISPER，Padlet 網址在 WHISPER_PADLET）
         { id: 'c3', name: '樹洞裡的悄悄話', en: 'Whispers in the Tree Hollow', model: 'desk', game: 'whisper',
           desc: '對著樹洞說一句悄悄話：閱讀感想、文學問題、創作靈感，或寫給文學人物的一句話。掛上 Padlet，每個人的想法都會變成藏書樹上的一片葉子。',
-          descEn: 'Whisper into the tree hollow: a reading response, a question about literature, a spark for writing, or a line to a literary figure. Pin it on Padlet and every idea becomes a leaf on the book tree.' }
+          descEn: 'Whisper into the tree hollow: a reading response, a question about literature, a spark for writing, or a line to a literary figure. Pin it on Padlet and every idea becomes a leaf on the book tree.' },
+        // game: 'library' → 「藏在書頁裡的世界」（六道入口在 LIBRARY_GATES，書在 LIBRARY_BOOKS）
+        { id: 'c4', name: '藏在書頁裡的世界', en: 'Worlds Hidden in the Pages', model: 'book', game: 'library',
+          desc: '不是推薦一本書，而是邀請你走進一本書。依照你此刻的心情，推開一道文學入口；樹上發光的書一翻開，就是一個提問、一段背景，和一條讓你忍不住想讀下去的線索。',
+          descEn: 'Not a book recommendation but an invitation into a book. Choose a literary gate that matches your mood; open a glowing book on the tree to find a question, a little background and a clue that makes you want to keep reading (in Chinese).' }
       ] }
   ],
   flows: [
     { id: 'f1', from: 'rabbit', to: 'rose', cargo: 'book', cargoName: '作品', cargoEn: 'works', role: 'researcher', level: 'official',
       title: '創作收進玫瑰園', titleEn: 'Work into the rose garden', desc: '番薯老師把新的創作，從兔子洞送進紅心皇后的玫瑰園。', descEn: 'Teacher Sweet Potato carries new work from the rabbit-hole to the rose garden.' },
     { id: 'f2', from: 'hatter', to: 'cheshire', cargo: 'toolbox', cargoName: '點子', cargoEn: 'ideas', role: 'commuter', level: 'thematic',
-      title: '百寶箱到藏書樹', titleEn: 'From the chest to the book tree', desc: '百寶箱遊樂場裡玩出來的點子，送到藏書樹，變成兔子洞裡的國文課與文學岔路。', descEn: 'Ideas played out in the chest’s playground go to the book tree to become lessons and literary crossroads.' },
+      title: '百寶箱到藏書樹', titleEn: 'From the chest to the book tree', desc: '百寶箱遊樂場裡玩出來的點子，送到藏書樹，變成兔子洞裡的國文課與柴郡貓的怪問題。', descEn: 'Ideas played out in the chest’s playground go to the book tree to become lessons and the Cheshire Cat’s odd questions.' },
     { id: 'f3', from: 'cheshire', to: 'rose', cargo: 'chart', cargoName: '學習成果', cargoEn: 'learning results', role: 'student', level: 'official',
       title: '課堂成果展出', titleEn: 'Class work on display', desc: '課堂裡的學生作品，送到玫瑰園展出。', descEn: 'Student work from class goes on display in the rose garden.' }
   ],
   dayCycle: [
-    { start: 360,  name: '晨讀時光', en: 'Morning reading',     items: ['c1', 'c2'] },
+    { start: 360,  name: '晨讀時光', en: 'Morning reading',     items: ['c1', 'c4'] },
     { start: 720,  name: '午後創作', en: 'Afternoon creating',  items: ['r1', 'r2'] },
     { start: 1080, name: '放學遊樂場', en: 'After-school playground', items: ['h1', 'h2', 'h3'] }
   ]
@@ -784,7 +788,7 @@ body { font-size: 13px; }
 .rb-row .rb-main:hover { background: var(--rose-deep); }
 .rb-note { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.6; }
 @media (prefers-reduced-motion: reduce) { .rb * { animation: none !important; transition: none !important; } }
-/* ♠ 柴郡貓的文學岔路（.cx）與樹洞裡的悄悄話（.wx） */
+/* ♠ 柴郡貓的怪問題（.cx）與樹洞裡的悄悄話（.wx） */
 .cx-msg, .wx-msg { text-align: center; color: var(--rose-deep); font-size: 13px; font-weight: 700; margin: 4px 0 8px; min-height: 18px; }
 .cx-q { background: var(--paper); border-radius: 14px; padding: 14px 12px; box-shadow: var(--gold-frame), var(--chip-shadow); text-align: center; margin-bottom: 10px; animation: pxRise .5s cubic-bezier(.3, 1.4, .5, 1); }
 .cx-q .k { font-size: 11.5px; color: var(--muted); letter-spacing: .12em; }
@@ -836,6 +840,54 @@ body { font-size: 13px; }
 .wx-pad { display: block; margin-top: 10px; text-align: center; text-decoration: none; padding: 10px 12px; border-radius: 14px; background: linear-gradient(120deg, var(--lilac), var(--rose-pale)); color: var(--plum); font: 800 14px/1.4 var(--serif); box-shadow: var(--chip-shadow); }
 .wx-pad:hover { filter: brightness(1.04); }
 .wx-pad small { display: block; font: 600 11.5px/1.4 var(--sans); color: var(--muted); }
+.cx-other { margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed var(--lilac); }
+.cx-other h4 { margin: 0 0 2px; font: 900 15px/1.4 var(--serif); color: var(--rose-deep); }
+.cx-other blockquote { border-left-color: var(--rose); background: var(--rose-pale); }
+/* ♠ 藏在書頁裡的世界（.bx） */
+.bx-msg { text-align: center; color: var(--rose-deep); font-size: 13px; font-weight: 700; margin: 4px 0 10px; min-height: 18px; line-height: 1.55; }
+.bx-gates { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bx-gate { position: relative; border: 0; border-radius: 48px 48px 14px 14px; padding: 16px 8px 12px; background: linear-gradient(170deg, var(--g1), var(--g2)); color: var(--plum); cursor: pointer; text-align: center; font: inherit; box-shadow: var(--chip-shadow), inset 0 0 0 3px rgba(255, 255, 255, .55); transition: transform .2s, box-shadow .2s; overflow: hidden; }
+.bx-gate::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, .7), transparent 60%); opacity: 0; transition: opacity .3s; }
+.bx-gate:hover { transform: translateY(-3px); box-shadow: 0 0 18px var(--g1), inset 0 0 0 3px rgba(255, 255, 255, .8); }
+.bx-gate:hover::after { opacity: 1; }
+.bx-gate .no { position: absolute; top: 8px; left: 12px; font: 900 13px/1 var(--serif); opacity: .7; }
+.bx-gate .ic { display: block; font-size: 26px; line-height: 1.2; }
+.bx-gate b { display: block; font: 900 14px/1.35 var(--serif); margin-top: 4px; }
+.bx-gate small { display: block; font-size: 11.5px; margin-top: 3px; opacity: .85; }
+.bx-gate .cnt { display: inline-block; margin-top: 6px; font-size: 10.5px; font-weight: 800; background: rgba(255, 255, 255, .7); border-radius: 999px; padding: 1px 8px; }
+.bx-branch { position: relative; display: flex; justify-content: center; gap: 10px; padding: 26px 6px 10px; border-radius: 16px; background: linear-gradient(180deg, var(--g2), var(--paper)); }
+.bx-branch::before { content: ""; position: absolute; left: 6%; right: 6%; top: 10px; height: 7px; border-radius: 6px; background: linear-gradient(90deg, #8a6a5a, #a8846f, #8a6a5a); box-shadow: 0 2px 0 rgba(0, 0, 0, .08); }
+.bx-book { position: relative; flex: 1 1 0; max-width: 104px; border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; transform-origin: 50% -20px; animation: bxSway 3.6s ease-in-out infinite; animation-delay: var(--d); font: inherit; }
+.bx-book .str { width: 2px; height: 16px; background: #a8846f; margin-top: -16px; }
+.bx-book .cv { display: block; width: 100%; border-radius: 4px; box-shadow: 0 0 14px var(--g1), 0 6px 14px rgba(60, 30, 70, .25); animation: bxGlow 2.4s ease-in-out infinite; animation-delay: var(--d); transition: transform .2s; }
+.bx-book:hover .cv { transform: scale(1.06) rotate(-2deg); }
+.bx-book .nm { margin-top: 6px; font: 800 12px/1.35 var(--serif); color: var(--plum); text-align: center; }
+.bx-book.read::after { content: "✓ 翻過"; position: absolute; top: -4px; right: -4px; font-size: 10px; font-weight: 800; color: #fff; background: var(--mint); border-radius: 999px; padding: 2px 6px; }
+.bx-svg, .bx-img { display: block; width: 100%; height: auto; aspect-ratio: 12 / 17; object-fit: cover; border-radius: 4px; }
+.bx-open { position: relative; perspective: 1200px; margin-top: 4px; }
+.bx-page { min-height: 240px; background: var(--paper); background-image: linear-gradient(90deg, rgba(160, 132, 196, .14), transparent 14px); border-radius: 6px 16px 16px 6px; padding: 14px 14px 12px 20px; box-shadow: var(--gold-frame), var(--card-shadow); animation: bxPage 1.3s ease both; }
+.bx-gate-tag { margin: 0; font-size: 11.5px; font-weight: 800; color: var(--muted); letter-spacing: .08em; }
+.bx-page h3 { margin: 4px 0 10px; font: 900 20px/1.35 var(--serif); color: var(--plum); }
+.bx-page h3 small { display: block; font: 700 12px/1.4 var(--sans); color: var(--muted); }
+.bx-sec { margin-bottom: 10px; }
+.bx-sec span { display: inline-block; font-size: 11.5px; font-weight: 800; color: #fff; background: var(--plum-2); border-radius: 999px; padding: 2px 10px; }
+.bx-sec p { margin: 6px 0 0; font-size: 13.5px; line-height: 1.8; color: #3f3245; }
+.bx-sec.q p { font: 800 16px/1.7 var(--serif); color: var(--plum); }
+.bx-sec.k { background: var(--gold-pale); border-radius: 12px; padding: 8px 10px; }
+.bx-sec.k span { background: var(--rose); }
+.bx-end { margin: 6px 0 0; text-align: right; font: 700 12px/1.5 var(--serif); color: var(--muted); font-style: italic; }
+.bx-flip { position: absolute; top: 0; left: 0; width: 58%; transform-origin: 0 50%; animation: bxCover 1.6s cubic-bezier(.45, .05, .3, 1) forwards; filter: drop-shadow(4px 6px 10px rgba(60, 30, 70, .3)); pointer-events: none; backface-visibility: hidden; }
+.bx-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+.bx-row .btn { font-size: 13.5px; }
+.bx-row .bx-main { background: var(--rose); color: #fff; font-weight: 800; }
+.bx-row .bx-main:hover { background: var(--rose-deep); }
+.bx-trail { margin-top: 10px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+.bx-trail b { color: var(--plum); }
+@keyframes bxSway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes bxGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12) drop-shadow(0 0 6px rgba(255, 240, 180, .8)); } }
+@keyframes bxCover { 0%, 22% { transform: rotateY(0); opacity: 1; } 80% { opacity: 1; } 100% { transform: rotateY(-170deg); opacity: 0; } }
+@keyframes bxPage { 0%, 25% { opacity: 0; transform: scale(.96); } 100% { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bx * { animation: none !important; transition: none !important; } .bx-flip { display: none; } }
 @keyframes wxLeaf { from { transform: translateY(-14px) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .cx *, .wx * { animation: none !important; transition: none !important; } }
 </style>
@@ -1845,166 +1897,240 @@ window.GAMES = Object.assign(window.GAMES || {}, { rabbit: window.RabbitGame });
 </script>
 <script>
 /* ================================================================
-   ♠ 柴郡貓的藏書樹 —— 柴郡貓的文學岔路
-   在 DATA 的項目裡加上 game: 'crossroads' 就會出現。
-   從一個生活問題出發，選一條路，走到路的盡頭遇見一部文學作品。
-   老師可以直接在 CROSSROADS 增刪問題與路線：
-     q 生活問題
-     paths 每條路：ic 圖示、go 你的選擇、sign 路牌名稱、
-                   who 作者、work 作品、line 原文、meet 為什麼會在這裡遇見他、ask 帶走一個問題
+   ♠ 柴郡貓的藏書樹 —— 柴郡貓的怪問題
+   在 DATA 的項目裡加上 game: 'oddq' 就會出現。
+   柴郡貓丟出一個奇怪、好笑、卻值得認真想的問題；學生先憑直覺選，
+   再揭曉：兩千年前的哲學家、文學家，也吵過一樣的問題。
+   老師可以直接在 ODDQ_TYPES（四種怪問題）與 ODDQ（題目）增刪：
+     type 類型代號、q 問題、
+     opts 直覺選項：t 選項文字、v 對應到 voices 的第幾位（從 0 算）、quip 柴郡貓的吐槽
+     voices 古人怎麼想：who 人物、work 出處、line 原文、say 白話解說
+     next 柴郡貓的追問（帶回生活的思辨）
    ================================================================ */
-const CROSSROADS = [
-  { q: '如果人生可以重來，你會選擇自由還是成功？', paths: [
-    { ic: '🌼', go: '我選自由', sign: '往東籬的菊花田', who: '陶淵明', work: '〈歸去來辭〉',
-      line: '悟已往之不諫，知來者之可追；實迷途其未遠，覺今是而昨非。',
-      meet: '四十一歲的陶淵明，當了八十多天的彭澤縣令就辭職回家。他不是失敗了，而是發現自己「以心為形役」——身體換來俸祿，心卻被關起來。回家種田很窮，但他說：走錯的路還不遠，現在回頭剛剛好。',
-      ask: '如果自由的代價是「變窮」，你願意付多少？' },
-    { ic: '⛈️', go: '我選成功——但如果失敗了呢？', sign: '往沙湖道中的雨', who: '蘇軾', work: '〈定風波〉',
-      line: '竹杖芒鞋輕勝馬，誰怕？一蓑煙雨任平生。',
-      meet: '蘇軾年少成名，一路追求功業，卻因烏臺詩案差點喪命，被貶到黃州。某天出遊遇雨，同伴狼狽逃竄，他拄著竹杖慢慢走。成功的路他走過，跌倒他也嘗過，最後學會的是：風雨來時，自己還站得住。',
-      ask: '你心中的「成功」，被拿走之後還剩下什麼？' },
-    { ic: '🐟', go: '誰規定只能二選一？', sign: '往北冥的大海', who: '莊子', work: '〈逍遙遊〉',
-      line: '至人無己，神人無功，聖人無名。',
-      meet: '莊子會先反問你：「自由」和「成功」是誰定義的？大鵬飛九萬里，小麻雀在樹叢間跳，都覺得自己最好。真正的逍遙，是不再被「功」與「名」這些標準綁住——連「選擇」本身都可以放下。',
-      ask: '如果沒有人會看見、會評分，你還想要什麼？' }
-  ] },
-  { q: '如果你最好的朋友變得比你優秀，你會怎麼想？', paths: [
-    { ic: '🤝', go: '真心替他開心', sign: '往齊國的市集', who: '司馬遷', work: '《史記・管晏列傳》',
-      line: '生我者父母，知我者鮑子也。',
-      meet: '鮑叔牙和管仲一起做生意，管仲總是多拿錢；打仗時管仲逃跑。鮑叔牙不怪他，還把宰相的位子讓給他。管仲後來成為一代名相，最感謝的就是這個「比自己還懂自己」的朋友。',
-      ask: '你身邊有沒有一個人，願意讓你站得比他高？' },
-    { ic: '🫘', go: '老實說，有點不是滋味', sign: '往魏宮的大殿', who: '曹植', work: '〈七步詩〉（傳）',
-      line: '本是同根生，相煎何太急？',
-      meet: '相傳曹丕當上皇帝後，逼才華洋溢的弟弟曹植七步內作詩，否則處死。豆子和豆萁本是同一株，卻一個在鍋裡哭、一個在鍋下燒——嫉妒的火，最先燒到的往往是最親近的人。',
-      ask: '你曾經因為比較，而傷害過一段關係嗎？' },
-    { ic: '🪶', go: '乾脆不比了', sign: '往南海的梧桐樹', who: '莊子', work: '《莊子・秋水》',
-      line: '夫鵷鶵發於南海，而飛於北海；非梧桐不止，非練實不食，非醴泉不飲。',
-      meet: '惠子當上梁國宰相，聽說莊子要來，怕被搶位子，全城搜捕三天。莊子卻說：鵷鶵這種鳥只停梧桐、只喝甘泉，貓頭鷹叼著腐爛的老鼠，還怕牠來搶呢！你在乎的東西，別人可能根本不想要。',
-      ask: '你和朋友爭的那樣東西，真的是你想要的嗎？' }
-  ] },
-  { q: '考砸、失敗的時候，你最想聽到哪一句話？', paths: [
-    { ic: '🔁', go: '「沒關係，再來一次」', sign: '往烏江的渡口', who: '杜牧', work: '〈題烏江亭〉',
-      line: '江東子弟多才俊，捲土重來未可知。',
-      meet: '項羽兵敗垓下，到了烏江邊，覺得無顏見江東父老，選擇自刎。一千年後，杜牧經過這裡替他可惜：勝敗本來就難料，忍得住羞恥才是真男兒——如果當時渡江，誰知道結局會怎樣？',
-      ask: '如果給你一次「捲土重來」的機會，你會從哪裡開始？' },
-    { ic: '⛵', go: '「總有一天會好起來」', sign: '往長安的大道', who: '李白', work: '〈行路難〉',
-      line: '長風破浪會有時，直掛雲帆濟滄海。',
-      meet: '李白被賜金放還、離開長安，面對滿桌美酒卻「停杯投箸不能食」。他前面寫盡了路難行，最後仍然逼自己抬起頭：總有一天，會乘著大風破浪而去。',
-      ask: '你現在面前的「行路難」是什麼？哪一陣「長風」可能會來？' },
-    { ic: '🌙', go: '「先停下來休息也可以」', sign: '往承天寺的庭院', who: '蘇軾', work: '〈記承天寺夜遊〉',
-      line: '何夜無月？何處無竹柏？但少閑人如吾兩人者耳。',
-      meet: '被貶黃州的蘇軾，某夜睡不著，看到月色很美，就去找同樣被貶的張懷民散步。滿地月光像積水，竹柏的影子像水草。失意的人，反而成了能看見月亮的「閑人」。',
-      ask: '最近一次，你停下來看見了什麼平常沒注意的東西？' }
-  ] },
-  { q: '如果可以逃離生活一天，你想去哪裡？', paths: [
-    { ic: '🌸', go: '一個沒有人找得到的地方', sign: '往溪水盡頭的桃花林', who: '陶淵明', work: '〈桃花源記〉',
-      line: '緣溪行，忘路之遠近。忽逢桃花林，夾岸數百步，中無雜樹，芳草鮮美，落英繽紛。',
-      meet: '武陵漁人迷了路，誤闖一個沒有戰亂、人人安樂的村莊。離開時他到處做記號，回頭卻再也找不到。最美好的地方，也許只能在「不經意」的時候遇見。',
-      ask: '你的「桃花源」裡，一定要有什麼、一定不能有什麼？' },
-    { ic: '🍶', go: '一個超熱鬧的地方', sign: '往金樽清酒的宴席', who: '李白', work: '〈將進酒〉',
-      line: '天生我材必有用，千金散盡還復來。',
-      meet: '李白的逃離不是躲起來，而是放聲大笑、舉杯痛飲。在最熱鬧的宴席上，他其實藏著「萬古愁」——越喧嘩，越是想把心裡的苦悶一口氣喝掉。',
-      ask: '你在人群中最熱鬧的時候，有沒有覺得特別孤單？' },
-    { ic: '🏠', go: '回到小時候的家', sign: '往百年老屋的小書房', who: '歸有光', work: '〈項脊軒志〉',
-      line: '庭有枇杷樹，吾妻死之年所手植也，今已亭亭如蓋矣。',
-      meet: '一間又小又漏雨的老書房，裝著祖母、母親與妻子的身影。歸有光沒有大聲哭喊，只說院子裡那棵樹已經長得像傘一樣大了——時間走了，人也走了，回不去的地方最想念。',
-      ask: '你家裡有沒有一樣東西，看到就會想起某個人？' }
-  ] },
-  { q: '一直被誤解的時候，你會怎麼做？', paths: [
-    { ic: '🪷', go: '堅持到底，我沒有錯', sign: '往汨羅江畔', who: '屈原', work: '〈漁父〉',
-      line: '舉世皆濁我獨清，眾人皆醉我獨醒，是以見放。',
-      meet: '被放逐的屈原在江邊憔悴行吟。漁父勸他隨波逐流，他寧可葬身魚腹，也不讓潔白的自己蒙上塵埃。這是一種近乎固執的高貴。',
-      ask: '有什麼原則，是你就算被誤解也不想放棄的？' },
-    { ic: '🛶', go: '算了，一笑置之', sign: '往滄浪之水', who: '〈漁父〉裡的漁父', work: '〈漁父〉',
-      line: '滄浪之水清兮，可以濯吾纓；滄浪之水濁兮，可以濯吾足。',
-      meet: '同一篇文章，換個角色看世界：漁父笑著划船離開，唱著水清就洗帽帶、水濁就洗腳。世界不會因為你而改變，那就調整自己與它相處的方式。',
-      ask: '屈原和漁父，你比較像誰？你想成為誰？' },
-    { ic: '📜', go: '寫下來，留給懂的人', sign: '往藏書的名山', who: '司馬遷', work: '〈報任安書〉',
-      line: '僕誠已著此書，藏之名山，傳之其人。',
-      meet: '司馬遷為李陵說了句公道話，卻遭受宮刑。他忍辱活下來，只為完成《史記》。當下沒有人懂，那就寫下來——留給以後懂的人。',
-      ask: '如果要寫一封信給「十年後懂你的人」，你會寫什麼？' }
-  ] },
-  { q: '喜歡一個人卻說不出口，你會怎麼辦？', paths: [
-    { ic: '🌾', go: '遠遠看著就好', sign: '往白露為霜的河邊', who: '《詩經》', work: '〈蒹葭〉',
-      line: '蒹葭蒼蒼，白露為霜。所謂伊人，在水一方。',
-      meet: '兩千多年前，有人在秋天的河邊，一次又一次地追尋對岸的那個人：逆流而上，路又遠又難；順流而下，她又好像在水中央。看得見卻到不了，是最古老的暗戀。',
-      ask: '「到不了」的美，和「得到了」的美，哪一種比較讓你心動？' },
-    { ic: '🎶', go: '鼓起勇氣唱出來', sign: '往越國的小船', who: '先秦民歌', work: '〈越人歌〉',
-      line: '山有木兮木有枝，心悅君兮君不知。',
-      meet: '一位划船的越國人，愛上了船上的楚國王子。語言不通、身分懸殊，他還是唱出了心意。山有樹、樹有枝，我喜歡你，你卻不知道——說出口，至少就不留遺憾。',
-      ask: '如果只能用一個比喻告白，你會用什麼？' },
-    { ic: '🎐', go: '把它收進回憶裡', sign: '往五十弦的錦瑟', who: '李商隱', work: '〈錦瑟〉',
-      line: '此情可待成追憶？只是當時已惘然。',
-      meet: '李商隱回頭看一段感情：這份心情難道要等到變成回憶才懂嗎？其實在當下，就已經悵然若失了。有些話沒說，就成了一輩子最美也最朦朧的詩。',
-      ask: '有沒有一句話，你到現在還後悔當初沒有說？' }
-  ] }
+const ODDQ_TYPES = [
+  { k: 'moral', ic: '⚖️', name: '是非顛倒題', sub: '對與錯，真的分得那麼清楚嗎？', skill: '價值判斷' },
+  { k: 'dream', ic: '🌀', name: '腦洞大開題', sub: '如果世界換個樣子，你會怎麼選？', skill: '想像與存在' },
+  { k: 'argue', ic: '🐟', name: '抬槓辯論題', sub: '看似無聊的抬槓，其實是邏輯大戰', skill: '邏輯與語言' },
+  { k: 'human', ic: '🌱', name: '人性實驗題', sub: '人到底是什麼樣的動物？', skill: '人性與自我' }
 ];
-window.CrossroadsGame = (() => {
-  const GRIN = ['柴郡貓咧嘴一笑：「每條路都通往某個地方，只要你走得夠遠。」', '「你要往哪裡走？」「那要看你想去哪裡。」', '柴郡貓的身體消失了，只剩笑容掛在樹上：「選一條吧。」', '「這裡的人都有點瘋，包括你——所以你才會來到這裡。」'];
+const ODDQ = [
+  // ⚖️ 是非顛倒題
+  { type: 'moral', q: '如果說謊可以讓一個人開心，說謊還是錯的嗎？',
+    opts: [
+      { t: '不，善意的謊言是溫柔', v: 1, quip: '柴郡貓：「我也常說謊，比如我說我在這裡。」' },
+      { t: '是，說謊就是說謊', v: 0, quip: '柴郡貓：「好嚴格喔，那你敢說你喜歡我的笑容嗎？」' },
+      { t: '要看是為了誰、為了什麼', v: 1, quip: '柴郡貓：「看情況？你比我還會消失。」' }
+    ],
+    voices: [
+      { who: '孔子', work: '《論語・為政》', line: '人而無信，不知其可也。', say: '一個人如果不講信用，真不知道他還能做什麼。對孔子來說，「信」是人立足的根本，就像車子少了輪軸，根本走不動。' },
+      { who: '孟子', work: '《孟子・離婁下》', line: '大人者，言不必信，行不必果，惟義所在。', say: '真正有德行的人，說過的話不一定死守、做過的決定不一定硬撐到底——關鍵是：這樣做「對不對」（義）。孟子把判斷權交給了良心，而不是規則。' }
+    ],
+    next: '如果「善意的謊言」被拆穿了，對方會更開心，還是更受傷？' },
+  { type: 'moral', q: '好朋友考試作弊，老師問你有沒有看到。你會說實話，還是幫他瞞？',
+    opts: [
+      { t: '說實話，對就是對', v: 0, quip: '柴郡貓：「你的朋友正在遠方打噴嚏。」' },
+      { t: '幫他瞞，友情比較重要', v: 1, quip: '柴郡貓：「嘿嘿，我會替你保密的……大概。」' }
+    ],
+    voices: [
+      { who: '葉公', work: '《論語・子路》', line: '吾黨有直躬者，其父攘羊，而子證之。', say: '葉公得意地對孔子說：我們這裡有個正直的人，他爸偷了羊，他親自出面作證。在葉公眼裡，這就是「直」——不管對方是誰，事實就是事實。' },
+      { who: '孔子', work: '《論語・子路》', line: '吾黨之直者異於是：父為子隱，子為父隱，直在其中矣。', say: '孔子卻回答：我們那裡的「直」不一樣，父親替兒子隱瞞、兒子替父親隱瞞，正直就在其中。對孔子來說，連親情都不顧的「正直」，反而不近人情。' }
+    ],
+    next: '「隱瞞」和「說謊」一樣嗎？如果作弊會害到其他同學，你的答案會改變嗎？' },
+  { type: 'moral', q: '有一顆按鈕：按下去全班都及格，但只有你會被當。你按不按？',
+    opts: [
+      { t: '按！為大家犧牲一下', v: 1, quip: '柴郡貓：「好偉大，但你明年還要再上一次這門課喔。」' },
+      { t: '不按，我的人生我負責', v: 0, quip: '柴郡貓：「誠實的自私，也是一種誠實。」' }
+    ],
+    voices: [
+      { who: '楊朱', work: '《孟子・盡心上》引', line: '楊子取為我，拔一毛而利天下，不為也。', say: '楊朱主張「為我」：就算拔一根毛就能讓天下得利，他也不做。這不只是小氣——他認為，每個人都先顧好自己，天下自然太平。' },
+      { who: '墨子', work: '《孟子・盡心上》引', line: '墨子兼愛，摩頂放踵利天下，為之。', say: '墨子則站在另一個極端：只要對天下有利，從頭頂磨到腳跟都願意。孟子把兩人放在一起批評，認為一個太自私、一個太無私，都忘了「親疏」的分寸。' }
+    ],
+    next: '「犧牲自己」一定比「保護自己」高尚嗎？什麼時候該先顧好自己？' },
+  // 🌀 腦洞大開題
+  { type: 'dream', q: '如果你今晚夢見自己變成一隻貓，醒來後，你怎麼確定你不是一隻正在做夢的貓？',
+    opts: [
+      { t: '我很確定，我就是我', v: 0, quip: '柴郡貓：「喵。我也這麼說過。」' },
+      { t: '……好像真的沒辦法確定', v: 0, quip: '柴郡貓：「恭喜，你開始跟莊子一樣睡不著了。」' },
+      { t: '是誰都沒差，開心就好', v: 1, quip: '柴郡貓：「這個答案，有一位很會喝酒的詩人會喜歡。」' }
+    ],
+    voices: [
+      { who: '莊子', work: '《莊子・齊物論》', line: '不知周之夢為胡蝶與，胡蝶之夢為周與？', say: '莊子夢見自己變成蝴蝶，飛得好開心，完全忘了自己是莊周。醒來後他困惑了：到底是我夢見了蝴蝶，還是蝴蝶夢見了我？「我」的邊界，原來沒有那麼清楚。' },
+      { who: '李白', work: '〈春夜宴從弟桃花園序〉', line: '而浮生若夢，為歡幾何？', say: '李白的回答很瀟灑：人生本來就像一場夢，快樂的時間能有多少？既然如此，就趁著春夜、桃花、兄弟都在，好好喝一杯吧！' }
+    ],
+    next: '如果人生真的是一場夢，你還會那麼在意考試、排名和別人的眼光嗎？' },
+  { type: 'dream', q: '有一台機器能讓你永遠活在最快樂的夢裡，你要不要躺進去？',
+    opts: [
+      { t: '要！現實太累了', v: 1, quip: '柴郡貓：「先說好，夢裡的蛋糕沒有熱量，但也吃不飽。」' },
+      { t: '不要，假的快樂不算快樂', v: 0, quip: '柴郡貓：「那你怎麼知道你現在不在機器裡？」' }
+    ],
+    voices: [
+      { who: '沈既濟', work: '〈枕中記〉', line: '夫寵辱之道，窮達之運，得喪之理，死生之情，盡知之矣。', say: '唐傳奇裡的盧生借了道士的枕頭小睡，夢中娶妻、做官、被貶、封公、享盡榮華，直到老死——醒來時，店主人蒸的黃粱飯都還沒熟。他說：榮辱得失，我全都明白了。' },
+      { who: '莊子', work: '《莊子・齊物論》', line: '方其夢也，不知其夢也。……且有大覺而後知此其大夢也。', say: '莊子說：做夢的時候，不知道自己在做夢；要等到「大覺醒」，才知道一生原來是一場大夢。真正的問題不是夢好不好，而是你醒著沒有。' }
+    ],
+    next: '你人生中有沒有某段「黃粱一夢」——當時好在乎，現在回頭看卻覺得很輕？' },
+  { type: 'dream', q: '如果可以用一年的壽命，換一首流傳一千年的詩，你換不換？',
+    opts: [
+      { t: '換！讓千年後的人記得我', v: 0, quip: '柴郡貓：「好的，請在這裡簽名，墨水是用你的時間做的。」' },
+      { t: '不換，現在活得開心最重要', v: 1, quip: '柴郡貓：「聰明。我可是只活在當下的貓。」' }
+    ],
+    voices: [
+      { who: '曹丕', work: '《典論・論文》', line: '年壽有時而盡，榮樂止乎其身，二者必至之常期，未若文章之無窮。', say: '當上皇帝的曹丕說：壽命會結束，榮華也只到自己這一代為止，只有文章可以無窮無盡。一個擁有一切的帝王，最相信的竟然是「寫作」。' },
+      { who: '〈古詩十九首〉', work: '〈生年不滿百〉', line: '生年不滿百，常懷千歲憂。晝短苦夜長，何不秉燭遊！', say: '無名詩人卻笑那些「活不到一百歲，卻擔心一千年後」的人：白天太短、夜晚太長，何不點起蠟燭去玩？與其追求不朽，不如把握眼前。' }
+    ],
+    next: '你想被記住的，是你「做過什麼」，還是你「是什麼樣的人」？' },
+  // 🐟 抬槓辯論題
+  { type: 'argue', q: '你又不是你家的貓，怎麼知道牠現在在生氣？',
+    opts: [
+      { t: '看尾巴、看眼神就知道啊', v: 0, quip: '柴郡貓：「那你猜猜我現在在想什麼？（咧嘴）」' },
+      { t: '的確……我永遠不可能真的知道', v: 1, quip: '柴郡貓：「那你也不知道我是不是在笑。」' }
+    ],
+    voices: [
+      { who: '莊子', work: '《莊子・秋水》', line: '子非我，安知我不知魚之樂？……我知之濠上也。', say: '莊子和好友惠子在濠水橋上散步，莊子說魚游得好快樂。惠子抬槓，莊子回擊：「你又不是我，怎麼知道我不知道魚快樂？」最後他說：我是在橋上，用心感受到的。' },
+      { who: '惠子', work: '《莊子・秋水》', line: '子非魚，安知魚之樂？', say: '惠子是名家的邏輯高手，他追問：你又不是魚，憑什麼說魚快樂？在他看來，每個人都被困在自己的感受裡，無法真正進入別人的心。' }
+    ],
+    next: '我們常說「我懂你」，但我們真的能懂另一個人嗎？「同理心」靠的是邏輯還是感受？' },
+  { type: 'argue', q: '珍珠奶茶如果沒有加珍珠，還能叫珍珠奶茶嗎？',
+    opts: [
+      { t: '不能，名字跟內容要一致', v: 0, quip: '柴郡貓：「那『老婆餅』裡沒有老婆，你要不要去檢舉？」' },
+      { t: '可以啦，大家都這樣叫', v: 1, quip: '柴郡貓：「好，那我從今天起叫自己『獅子』。」' }
+    ],
+    voices: [
+      { who: '公孫龍', work: '〈白馬論〉', line: '馬者，所以命形也；白者，所以命色也。命色者非命形也，故曰白馬非馬。', say: '戰國的公孫龍提出驚人的「白馬非馬」：「馬」說的是形體，「白」說的是顏色，兩個概念不一樣，所以白馬不等於馬。看似詭辯，其實是在追問：名稱與事物到底是什麼關係？' },
+      { who: '荀子', work: '《荀子・正名》', line: '名無固宜，約之以命，約定俗成謂之宜。', say: '荀子則說：名稱本來沒有固定該叫什麼，是大家約好了、習慣了，就變成合適的叫法。語言是一種社會契約。' }
+    ],
+    next: '網路上新出現的流行語，是「破壞」了語言，還是語言正在「約定俗成」？' },
+  { type: 'argue', q: '你換了髮型、換了手機、連身體的細胞都換了一輪，十年後的你還是「你」嗎？',
+    opts: [
+      { t: '不是了，人一直在變', v: 0, quip: '柴郡貓：「那十年後的你，可以不用還現在借的錢嗎？」' },
+      { t: '是啊，有些東西不會變', v: 1, quip: '柴郡貓：「比如我的笑容，就算身體不見了也還在。」' }
+    ],
+    voices: [
+      { who: '《呂氏春秋》', work: '〈察今〉', line: '舟已行矣，而劍不行，求劍若此，不亦惑乎？', say: '楚人的劍掉進江裡，他在船邊刻記號，等船停了再從記號處下水找。船已經走了，劍卻還在原地——用不變的眼光看正在變的世界，就會「刻舟求劍」。' },
+      { who: '蘇軾', work: '〈赤壁賦〉', line: '自其變者而觀之，則天地曾不能以一瞬；自其不變者而觀之，則物與我皆無盡也。', say: '蘇軾在赤壁的月光下說：從「變」的角度看，天地連一眨眼都撐不住；從「不變」的角度看，萬物和我都沒有窮盡。變與不變，取決於你怎麼看。' }
+    ],
+    next: '你身上有什麼是「十年前就有、十年後也想留著」的？' },
+  // 🌱 人性實驗題
+  { type: 'human', q: '如果撿到一個裝滿錢的錢包，而且保證不會被任何人發現，你會還嗎？',
+    opts: [
+      { t: '會，心裡會過意不去', v: 0, quip: '柴郡貓：「好人。不過我有看到你猶豫了 0.5 秒。」' },
+      { t: '老實說……可能會猶豫', v: 1, quip: '柴郡貓：「誠實得可愛。至少你在掙扎。」' }
+    ],
+    voices: [
+      { who: '孟子', work: '《孟子・公孫丑上》', line: '今人乍見孺子將入於井，皆有怵惕惻隱之心。', say: '孟子說：任何人突然看見小孩快掉進井裡，都會心頭一驚、想去救——不是為了討好誰，而是天生的「不忍人之心」。人性本善，那份過意不去就是證據。' },
+      { who: '荀子', work: '《荀子・性惡》', line: '人之性惡，其善者偽也。', say: '荀子唱反調：人天生就好利、會嫉妒，善良是後天「人為」（偽）努力出來的，靠學習、禮義和環境慢慢修成。所以猶豫不可恥，選擇歸還才可貴。' }
+    ],
+    next: '如果善良是天生的，壞人是怎麼來的？如果善良要靠學習，誰來教？' },
+  { type: 'human', q: '如果每天都有人誇你「你好棒、你是天才」，你會越來越強，還是越來越廢？',
+    opts: [
+      { t: '越來越強，被肯定就有動力', v: 1, quip: '柴郡貓：「你好棒。（看，你有沒有變強？）」' },
+      { t: '越來越廢，會飄起來', v: 0, quip: '柴郡貓：「飄起來？那歡迎加入我的消失俱樂部。」' }
+    ],
+    voices: [
+      { who: '王安石', work: '〈傷仲永〉', line: '泯然眾人矣。', say: '方仲永五歲就能寫詩，鄉里都誇他是神童，他爸便天天帶他四處表演賺錢，卻不讓他讀書。幾年後，王安石再聽到他的消息：已經跟普通人沒兩樣了。' },
+      { who: '荀子', work: '〈勸學〉', line: '積土成山，風雨興焉；積水成淵，蛟龍生焉。', say: '荀子說：堆土成山，風雨才會興起；積水成潭，蛟龍才會出現。天才不是被誇出來的，而是一點一滴累積出來的——讚美是風，但山得自己堆。' }
+    ],
+    next: '什麼樣的讚美會讓人進步？什麼樣的讚美會讓人停下來？' },
+  { type: 'human', q: '全班都說一件事是對的，只有你覺得不對。你會開口嗎？',
+    opts: [
+      { t: '會，就算只有我一個', v: 1, quip: '柴郡貓：「勇者。不過記得先確認一下自己沒看錯題目。」' },
+      { t: '先跟著大家，應該是我錯了吧', v: 0, quip: '柴郡貓：「這裡的人都有點瘋，包括『大家』。」' }
+    ],
+    voices: [
+      { who: '龐蔥', work: '《戰國策・魏策》', line: '夫市之無虎明矣，然而三人言而成虎。', say: '魏國大臣龐蔥問魏王：一個人說市場有老虎，你信嗎？不信。兩個人說呢？有點懷疑。三個人說呢？那就信了。市場明明沒有老虎，說的人多了，假的也變成真的——這就是「三人成虎」。' },
+      { who: '孟子', work: '《孟子・公孫丑上》', line: '自反而縮，雖千萬人，吾往矣。', say: '孟子說：反省自己，如果確定自己是對的，就算面對千萬人，我也要往前走。真正的勇氣，不是大聲，而是先誠實地檢查過自己。' }
+    ],
+    next: '網路上「大家都在說」的事，你怎麼判斷它是不是「市場裡的老虎」？' }
+];
+window.OddQGame = (() => {
+  const GRIN = ['柴郡貓從樹上慢慢浮現，先出現的是笑容：「來，回答我一個怪問題。」', '「這裡的人都有點瘋，包括你——所以你才會來到這裡。」', '柴郡貓咧嘴一笑：「別想太久，先憑直覺選！」', '「問題越怪，越值得認真想。」柴郡貓說完，只剩下笑容。'];
   const store = {
-    get(k, d) { try { const v = localStorage.getItem('crossroads:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem('crossroads:' + k, JSON.stringify(v)); } catch (e) { /* 私密模式等情況忽略 */ } }
+    get(k, d) { try { const v = localStorage.getItem('oddq:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('oddq:' + k, JSON.stringify(v)); } catch (e) { /* 私密模式等情況忽略 */ } }
   };
   let memSeen = null;
   const seen = () => memSeen || (memSeen = store.get('seen', []));
-  const markSeen = (k) => { const v = seen(); if (!v.includes(k)) { v.push(k); store.set('seen', v); } };
+  const markSeen = (i) => { const v = seen(); if (!v.includes(i)) { v.push(i); store.set('seen', v); } };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const total = () => CROSSROADS.reduce((n, x) => n + x.paths.length, 0);
+  const typeOf = (k) => ODDQ_TYPES.find((t) => t.k === k);
 
   function html() { return '<div class="cx" id="cx"></div>'; }
 
   function init(root) {
     if (!root) return;
-    let qi = Math.floor(Math.random() * CROSSROADS.length);
-    const trail = () => `<div class="cx-trail">👣 你已經走過 <b>${seen().length}</b> / ${total()} 條文學岔路（足跡只存在這台裝置的瀏覽器裡）</div>`;
+    let cur = -1, type = null;
+    const trail = () => `<div class="cx-trail">😸 你已經回答了 <b>${seen().length}</b> / ${ODDQ.length} 個怪問題（紀錄只存在這台裝置的瀏覽器裡）</div>`;
+    const grin = () => GRIN[Math.floor(Math.random() * GRIN.length)];
 
-    function crossroads() {
-      const c = CROSSROADS[qi];
+    function menu() {
       root.innerHTML = `
-        <p class="cx-msg">😸 ${esc(GRIN[Math.floor(Math.random() * GRIN.length)])}</p>
-        <div class="cx-q"><div class="k">岔路口 ${qi + 1} / ${CROSSROADS.length} · 生活裡的一個問題</div><div class="main">${esc(c.q)}</div></div>
-        <div class="cx-paths">${c.paths.map((p, i) => `
-          <button class="cx-path ${seen().includes(qi + ':' + i) ? 'seen' : ''}" type="button" data-go="${i}">
-            <span class="ic">${p.ic}</span>
-            <span><b>${esc(p.go)}</b><small>🪧 ${esc(p.sign)}</small></span>
-          </button>`).join('')}</div>
-        <div class="cx-row"><button class="btn" type="button" data-cx="next">🔀 換一個岔路口</button></div>
+        <p class="cx-msg">😸 ${esc(grin())}</p>
+        <div class="cx-paths">${ODDQ_TYPES.map((t) => {
+          const n = ODDQ.filter((x) => x.type === t.k).length, done = ODDQ.filter((x, i) => x.type === t.k && seen().includes(i)).length;
+          return `<button class="cx-path" type="button" data-type="${t.k}"><span class="ic">${t.ic}</span><span><b>${esc(t.name)}</b><small>${esc(t.sub)} · ${esc(t.skill)} · ${done}/${n}</small></span></button>`;
+        }).join('')}</div>
+        <div class="cx-row"><button class="btn cx-main" type="button" data-cx="rand">🎲 讓柴郡貓隨便丟一題</button></div>
         ${trail()}`;
-      root.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => arrive(Number(b.dataset.go)); });
-      root.querySelector('[data-cx="next"]').onclick = () => { qi = (qi + 1 + Math.floor(Math.random() * (CROSSROADS.length - 1))) % CROSSROADS.length; crossroads(); };
+      root.querySelectorAll('[data-type]').forEach((b) => { b.onclick = () => { type = b.dataset.type; ask(pick(type)); }; });
+      root.querySelector('[data-cx="rand"]').onclick = () => { type = null; ask(pick(null)); };
     }
-    function arrive(pi) {
-      const c = CROSSROADS[qi], p = c.paths[pi], first = !seen().includes(qi + ':' + pi);
-      markSeen(qi + ':' + pi);
+    function pick(k) {
+      const pool = ODDQ.map((x, i) => i).filter((i) => (!k || ODDQ[i].type === k) && i !== cur);
+      const fresh = pool.filter((i) => !seen().includes(i));
+      const from = fresh.length ? fresh : pool;
+      return from[Math.floor(Math.random() * from.length)];
+    }
+    function ask(i) {
+      cur = i; const x = ODDQ[i], t = typeOf(x.type);
       root.innerHTML = `
-        <p class="cx-msg">🪧 你選了「${esc(p.go)}」，沿著小路${esc(p.sign)}……</p>
+        <p class="cx-msg">😸 先別想太多，憑你的直覺選一個！</p>
+        <div class="cx-q"><div class="k">${t.ic} ${esc(t.name)} · ${esc(t.skill)}</div><div class="main">${esc(x.q)}</div></div>
+        <div class="cx-paths">${x.opts.map((o, j) => `
+          <button class="cx-path" type="button" data-opt="${j}"><span class="ic">${'ABC'[j]}</span><span><b>${esc(o.t)}</b></span></button>`).join('')}</div>
+        <div class="cx-row"><button class="btn" type="button" data-cx="menu">↩ 換一種怪問題</button></div>`;
+      root.querySelectorAll('[data-opt]').forEach((b) => { b.onclick = () => reveal(Number(b.dataset.opt)); });
+      root.querySelector('[data-cx="menu"]').onclick = menu;
+    }
+    function reveal(j) {
+      const x = ODDQ[cur], o = x.opts[j], t = typeOf(x.type), mine = x.voices[o.v];
+      const first = !seen().includes(cur); markSeen(cur);
+      const others = x.voices.filter((v, k) => k !== o.v);
+      root.innerHTML = `
+        <p class="cx-msg">${esc(o.quip)}</p>
+        <div class="cx-q"><div class="k">${t.ic} ${esc(t.name)} · 你的直覺：${esc(o.t)}</div><div class="main">${esc(x.q)}</div></div>
         <div class="cx-end">
-          <span class="tag">${first ? '✨ 意想不到的相遇' : '👣 舊地重遊'}</span>
-          <h3>${p.ic} ${esc(p.who)} ${esc(p.work)}</h3>
-          <p class="who">問題：${esc(c.q)}</p>
-          <blockquote>${esc(p.line)}</blockquote>
-          <p>${esc(p.meet)}</p>
-          <div class="ask">🍃 <b>帶走一個問題：</b>${esc(p.ask)}</div>
+          <span class="tag">📜 原來兩千年前，有人也想過這個問題</span>
+          <h3>🤝 你和 ${esc(mine.who)} 站在同一邊</h3>
+          <p class="who">${esc(mine.who)} ${esc(mine.work)}</p>
+          <blockquote>${esc(mine.line)}</blockquote>
+          <p>${esc(mine.say)}</p>
+          ${others.map((v) => `
+          <div class="cx-other">
+            <h4>⚔️ 但是，${esc(v.who)} 可能會反駁你</h4>
+            <p class="who">${esc(v.who)} ${esc(v.work)}</p>
+            <blockquote>${esc(v.line)}</blockquote>
+            <p>${esc(v.say)}</p>
+          </div>`).join('')}
+          <div class="ask">🐾 <b>柴郡貓的追問：</b>${esc(x.next)}</div>
         </div>
         <div class="cx-row">
-          <button class="btn" type="button" data-cx="back">↩ 回到岔路口，走另一條</button>
-          <button class="btn" type="button" data-cx="next">🔀 換一個岔路口</button>
-          <button class="btn cx-main" type="button" data-cx="whisper">🌳 把想法說給樹洞聽</button>
+          <button class="btn" type="button" data-cx="again">🎲 再來一個${type ? esc(t.name) : '怪問題'}</button>
+          <button class="btn" type="button" data-cx="menu">↩ 換一種怪問題</button>
+          <button class="btn cx-main" type="button" data-cx="whisper">🌳 把我的看法說給樹洞聽</button>
         </div>
         ${trail()}`;
-      root.querySelector('[data-cx="back"]').onclick = crossroads;
-      root.querySelector('[data-cx="next"]').onclick = () => { qi = (qi + 1 + Math.floor(Math.random() * (CROSSROADS.length - 1))) % CROSSROADS.length; crossroads(); };
+      root.querySelector('[data-cx="again"]').onclick = () => ask(pick(type));
+      root.querySelector('[data-cx="menu"]').onclick = menu;
       root.querySelector('[data-cx="whisper"]').onclick = () => {
-        // 把這次的相遇交給「樹洞裡的悄悄話」，自動帶入草稿
-        window.WHISPER_HANDOFF = { kind: 'read', text: `走過「${c.q}」的岔路，我選了「${p.go}」，遇見了${p.who}${p.work}。\n${p.ask}\n我的想法：` };
-        const t = document.querySelector('[data-item="c3"]');
-        if (t) t.click(); else window.open(window.WHISPER_PADLET, '_blank', 'noopener');
+        // 把這次的怪問題交給「樹洞裡的悄悄話」，自動帶入草稿
+        window.WHISPER_HANDOFF = { kind: 'ask', text: `柴郡貓的怪問題：${x.q}\n我的直覺是「${o.t}」，和${mine.who}站在同一邊。\n柴郡貓追問：${x.next}\n我的看法：` };
+        const el = document.querySelector('[data-item="c3"]');
+        if (el) el.click(); else window.open(window.WHISPER_PADLET, '_blank', 'noopener');
       };
-      if (first && seen().length === total()) confetti();
+      if (first && seen().length === ODDQ.length) confetti();
       root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     function confetti(n = 22) {
-      const e = ['😸', '🌙', '📖', '🍃', '✨', '♠'];
+      const e = ['😸', '🌙', '📜', '🐟', '✨', '♠'];
       for (let k = 0; k < n; k++) {
         const s = document.createElement('span'); s.className = 'fx-confetti';
         s.textContent = e[k % e.length]; s.style.left = Math.random() * 100 + 'vw';
@@ -2012,7 +2138,218 @@ window.CrossroadsGame = (() => {
         document.body.appendChild(s); setTimeout(() => s.remove(), 4200);
       }
     }
-    crossroads();
+    menu();
+  }
+  return { html, init };
+})();
+
+/* ================================================================
+   ♠ 柴郡貓的藏書樹 —— 藏在書頁裡的世界
+   在 DATA 的項目裡加上 game: 'library' 就會出現。
+   不是推薦一本書，而是邀請學生走進一本書：
+   先依心情挑一道「文學入口」，樹上掛著發光的書，點開後書本翻開，
+   裡面是一個好奇的提問、一小段作品背景、一個讓人想讀下去的線索。
+   老師可以直接增刪：
+     LIBRARY_GATES 六道入口：k 代號、name 名稱、tags 類型、ic 圖示、c 顏色
+     LIBRARY_BOOKS 書：gate 入口、t 書名、a 作者、ct 封面上的書名（可分行）、
+                   pal [底色1, 底色2, 點綴色]、m 封面圖案（emoji）、pat 花紋 stars|rain|dots|lines|waves|grid、
+                   img（選填：封面圖網址，填了就改用真實封面）、
+                   ask 好奇的提問、bg 作品背景、clue 繼續讀下去的線索
+   ================================================================ */
+const LIBRARY_GATES = [
+  { k: 'escape', no: '①', ic: '🗝️', name: '想逃離現實的時候', tags: '奇幻・冒險・想像', c: ['#b9a6f0', '#e3d9ff'] },
+  { k: 'rain', no: '②', ic: '🌧️', name: '心裡有點下雨的時候', tags: '療癒・孤獨・成長', c: ['#9cc3e8', '#dcecfa'] },
+  { k: 'case', no: '③', ic: '🔍', name: '腦袋想破案的時候', tags: '推理・懸疑・思辨', c: ['#8f8aa8', '#dedbea'] },
+  { k: 'heart', no: '④', ic: '💞', name: '想被理解的時候', tags: '青春・友情・關係', c: ['#f2a3bd', '#ffe3ec'] },
+  { k: 'ancient', no: '⑤', ic: '🏮', name: '想和古人聊天的時候', tags: '古典詩詞・文人故事', c: ['#e3b46b', '#fff0d2'] },
+  { k: 'flip', no: '⑥', ic: '🌍', name: '想顛覆世界的時候', tags: '社會議題・反思・哲學', c: ['#7fc9a6', '#dcf5e8'] }
+];
+const LIBRARY_BOOKS = [
+  // ① 想逃離現實的時候
+  { gate: 'escape', t: '小王子', a: '聖修伯里', ct: ['小王子'], pal: ['#1f3b73', '#4a6fb5', '#ffd76a'], m: '🌹', pat: 'stars',
+    ask: '如果你畫了一條吞下大象的蟒蛇，大人們卻都說那是一頂帽子，你還會繼續畫嗎？',
+    bg: '作者聖修伯里是一名飛行員，曾在撒哈拉沙漠迫降。1943 年，他在流亡美國期間寫下這本書；隔年，他在一次偵察飛行中失蹤，再也沒有回來。',
+    clue: '狐狸告訴小王子一個祕密：「真正重要的東西，用眼睛是看不見的。」可是在說出祕密之前，牠為什麼一定要小王子先「馴養」牠？' },
+  { gate: 'escape', t: '說不完的故事', a: '麥克・安迪', ct: ['說不完的', '故事'], pal: ['#6b2a3a', '#b3475f', '#f0c869'], m: '🐉', pat: 'grid',
+    ask: '如果你正在讀的那本書，突然發現「你」正在讀它，會發生什麼事？',
+    bg: '常被同學欺負的男孩巴斯提安，從舊書店帶走了一本神祕的書，躲進學校閣樓偷偷讀。書裡的「幻想國」，正被一種叫做「虛無」的東西一點一點吞噬。',
+    clue: '想拯救幻想國，女童王需要一個人類孩子替她取一個新名字。而書裡的人物，好像……聽得見巴斯提安的聲音。' },
+  { gate: 'escape', t: '山海經', a: '先秦至漢代佚名', ct: ['山海經'], pal: ['#24584f', '#3f8f7c', '#f5d08a'], m: '🐦', pat: 'waves',
+    ask: '如果要你替自己設計一隻神獸，牠會長什麼樣子？有什麼超能力？',
+    bg: '大約成書於戰國到漢代之間，是中國最古老的「奇幻生物圖鑑」兼地理書，記錄了上百種奇怪的山、水、神祇與異獸。',
+    clue: '「炎帝之少女，名曰女娃。女娃遊于東海，溺而不返，故為精衛，常銜西山之木石，以堙于東海。」一隻小鳥想把大海填平——她做得到嗎？' },
+  // ② 心裡有點下雨的時候
+  { gate: 'rain', t: '解憂雜貨店', a: '東野圭吾', ct: ['解憂', '雜貨店'], pal: ['#3b4a6b', '#6d86b3', '#ffd28a'], m: '✉️', pat: 'rain',
+    ask: '如果你可以寫一封信給三十年前的人，或收到一封來自過去的信，你最想問什麼？',
+    bg: '三個闖空門的年輕人，逃進一間廢棄的老雜貨店躲藏。半夜，鐵捲門的投信口突然塞進一封信——寫信的人，活在三十多年前。',
+    clue: '店門口的牛奶箱，好像是通往過去的郵筒。他們要不要回信？而這間雜貨店，跟他們三個人之間，又藏著什麼關係？' },
+  { gate: 'rain', t: '夏之庭', a: '湯本香樹實', ct: ['夏之庭'], pal: ['#3f7a4f', '#86c27a', '#fff3a8'], m: '🌻', pat: 'dots',
+    ask: '人死掉之後，會去哪裡？你有沒有曾經很想知道答案，卻不敢問出口？',
+    bg: '三個小學六年級的男孩，因為好奇「人死掉是什麼樣子」，決定去監視一位住在破舊房子裡、看起來快要不行的獨居老爺爺。',
+    clue: '原本是去「監視」，三個男孩卻開始幫老爺爺倒垃圾、拔草、在院子裡種花……這個夏天，會怎麼結束？' },
+  { gate: 'rain', t: '追風箏的孩子', a: '卡勒德・胡賽尼', ct: ['追風箏的', '孩子'], pal: ['#8a3b2e', '#d9774f', '#ffe1a6'], m: '🪁', pat: 'lines',
+    ask: '有沒有一件事，你一直後悔當時沒有挺身而出？',
+    bg: '1970 年代的阿富汗喀布爾，富家少爺阿米爾和僕人之子哈山一起長大、一起放風箏。一場風箏比賽後的冬天，阿米爾做了一個讓他後悔一生的選擇。',
+    clue: '哈山追著斷線的風箏跑去前，回頭說：「為你，千千萬萬遍。」多年後，阿米爾接到一通電話：「有個方法，可以讓一切再好起來。」' },
+  // ③ 腦袋想破案的時候
+  { gate: 'case', t: '福爾摩斯探案：血字的研究', a: '柯南・道爾', ct: ['福爾摩斯', '血字的研究'], pal: ['#2b2b3a', '#555571', '#d94f4f'], m: '🔎', pat: 'grid',
+    ask: '只看一個人的鞋子、手和曬黑的臉，你能推理出他從哪裡來嗎？',
+    bg: '這是福爾摩斯的第一次登場。剛從戰場回來的軍醫華生想找室友，遇到一個怪人，對方一見面就說：「你去過阿富汗吧。」',
+    clue: '一棟空屋裡躺著一具屍體，身上沒有明顯傷口，牆上卻用血寫著一個字：RACHE。這是一個女人的名字，還是德文的「復仇」？' },
+  { gate: 'case', t: '一個都不留', a: '阿嘉莎・克莉絲蒂', ct: ['一個', '都不留'], pal: ['#1d3346', '#3d6680', '#e8e2c8'], m: '🏝️', pat: 'waves',
+    ask: '如果你被困在一座孤島上，身邊的人一個接一個消失，你會相信誰？',
+    bg: '十個彼此不認識的人，收到神祕邀請來到一座孤島。晚餐後，留聲機突然響起，指控他們每個人都犯過一樁逃過法律制裁的罪。',
+    clue: '每個房間都掛著一首童謠。每死一個人，餐桌上的小瓷人就少一個。島上明明只有他們十個人——兇手在哪裡？' },
+  { gate: 'case', t: '狄公案', a: '高羅佩', ct: ['狄公案'], pal: ['#5a2330', '#9c3d4a', '#f2c66d'], m: '🏮', pat: 'lines',
+    ask: '一千多年前沒有指紋、沒有監視器，縣官要怎麼抓到兇手？',
+    bg: '作者高羅佩是一位荷蘭外交官，讀了中國古代公案小說後深深著迷，乾脆以唐代名臣狄仁傑為主角，用英文寫出一系列推理小說，後來又被翻譯回中文。',
+    clue: '狄公常常同時接下三件看似毫不相干的案子，散落的線索，最後卻在公堂上連成同一條線。' },
+  // ④ 想被理解的時候
+  { gate: 'heart', t: '奇蹟男孩', a: 'R. J. 帕拉秋', ct: ['奇蹟男孩'], pal: ['#2f5d8a', '#5fa3d6', '#ffffff'], m: '🚀', pat: 'stars',
+    ask: '如果可以選擇「說正確的話」或「說仁慈的話」，你會選哪一個？',
+    bg: '奧吉天生臉部有缺陷，動過二十七次手術，一直在家自學。五年級，他第一次走進學校——所有人都盯著他的臉。',
+    clue: '老師在黑板寫下九月的格言：「當你可以選擇正確或仁慈時，選擇仁慈。」可是萬聖節那天，奧吉聽見最信任的朋友在背後說了一句話……' },
+  { gate: 'heart', t: '麥田捕手', a: '沙林傑', ct: ['麥田捕手'], pal: ['#b33b2e', '#e2643f', '#ffe08a'], m: '🧢', pat: 'lines',
+    ask: '你有沒有覺得，身邊很多大人都好「假」？',
+    bg: '十六歲的霍爾頓又被學校退學了。他不敢回家，一個人在紐約街頭晃蕩了好幾天，看什麼都不順眼。',
+    clue: '妹妹問他，到底想做什麼？他說：想站在一大片麥田旁的懸崖邊，在孩子們快要掉下去的時候，把他們抓住。為什麼是「抓住」？' },
+  { gate: 'heart', t: '這些人，那些事', a: '吳念真', ct: ['這些人', '那些事'], pal: ['#6b5a4a', '#a88c6d', '#fff2d6'], m: '🏠', pat: 'dots',
+    ask: '你身邊有沒有一個「很普通」的人，其實藏著一個很不普通的故事？',
+    bg: '導演吳念真寫下他在礦村長大的童年，以及生命中遇見的家人、朋友和陌生人。每一篇都很短，卻常讓人讀到一半就紅了眼眶。',
+    clue: '這本書裡沒有英雄，只有一群平凡的人。讀著讀著，你可能會在某一篇裡，突然認出自己的家人。' },
+  // ⑤ 想和古人聊天的時候
+  { gate: 'ancient', t: '世說新語', a: '劉義慶', ct: ['世說', '新語'], pal: ['#3a4a6b', '#6a7fa8', '#f4e2b0'], m: '🛶', pat: 'waves',
+    ask: '如果半夜突然很想見一個朋友，你會立刻出發嗎？出發後又不想見了呢？',
+    bg: '南朝劉義慶編纂，記錄漢末到東晉名士的言行，像是一本「魏晉名士朋友圈貼文合集」：有人醉酒狂放、有人一言不合就割席絕交。',
+    clue: '王子猷在下雪的夜裡，划了一整夜的船去找朋友，到了門口卻轉身回家。他說：「吾本乘興而行，興盡而返，何必見戴？」' },
+  { gate: 'ancient', t: '浮生六記', a: '沈復', ct: ['浮生', '六記'], pal: ['#8a4f6b', '#c98aa6', '#fff0f5'], m: '🌙', pat: 'dots',
+    ask: '你心目中理想的愛情，是轟轟烈烈，還是一起把平凡的日子過得有趣？',
+    bg: '清代一位沒沒無聞的文人沈復，寫下自己和妻子芸娘的日常：賞月、插花、煮粥、窮到要變賣東西過日子。林語堂稱芸娘是「中國文學上一個最可愛的女人」。',
+    clue: '芸娘想去看廟會，可是當時女子不便出門——於是她換上丈夫的衣服、戴上帽子，女扮男裝出發了。她會被認出來嗎？' },
+  { gate: 'ancient', t: '蘇東坡傳', a: '林語堂', ct: ['蘇東坡傳'], pal: ['#3d5a3a', '#6f9a63', '#ffe7a8'], m: '🍃', pat: 'rain',
+    ask: '如果你被貶到很遠很遠的地方，你會一直抱怨，還是開始研究當地的美食？',
+    bg: '林語堂用英文寫成這本傳記，說蘇東坡是「一個不可救藥的樂天派」。這位大文豪一生被貶黃州、惠州，最遠被貶到了海南島。',
+    clue: '在惠州，他寫下「日啖荔枝三百顆，不辭長作嶺南人」。被貶，對他來說真的是人生的終點嗎？' },
+  // ⑥ 想顛覆世界的時候
+  { gate: 'flip', t: '動物農莊', a: '喬治・歐威爾', ct: ['動物農莊'], pal: ['#7a3b1f', '#c2683a', '#ffe08a'], m: '🐷', pat: 'grid',
+    ask: '如果推翻了一個壞老闆，新上任的老闆，一定會比較好嗎？',
+    bg: '農場裡的動物受夠了人類主人，發動革命把他趕走，在牆上寫下七條誡律，其中一條是：「所有動物一律平等。」',
+    clue: '牆上的誡律，不知道為什麼，一條一條悄悄改了字。最後，只剩下一句：「所有動物一律平等，但有些動物比其他動物更平等。」' },
+  { gate: 'flip', t: '蘇菲的世界', a: '喬斯坦・賈德', ct: ['蘇菲的', '世界'], pal: ['#2c4a7a', '#5a86c4', '#ffe9a8'], m: '📮', pat: 'stars',
+    ask: '「你是誰？」——這個問題，你能用一句話回答嗎？',
+    bg: '十四歲的蘇菲放學回家，在信箱裡發現一封沒有貼郵票的信，上面只寫著：「你是誰？」接著又來了一封：「世界從哪裡來？」',
+    clue: '神祕的哲學老師開始寄課程給她。可是同時，她也收到一張張寄給另一個女孩「席德」的明信片——蘇菲的世界，好像不是她以為的那樣。' },
+  { gate: 'flip', t: '華氏 451 度', a: '雷・布萊伯利', ct: ['華氏', '451 度'], pal: ['#3a1f1f', '#a33b20', '#ffb347'], m: '🔥', pat: 'lines',
+    ask: '如果有一天，所有的書都被禁止，你會偷偷藏起哪一本？',
+    bg: '在這個未來世界，消防員的工作不是滅火，而是放火燒書。華氏 451 度，正是紙張開始燃燒的溫度。',
+    clue: '消防員蒙塔格一直很喜歡自己的工作，直到某天夜裡，一個十七歲的女孩問了他一個問題：「你快樂嗎？」' }
+];
+window.LibraryGame = (() => {
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('library:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('library:' + k, JSON.stringify(v)); } catch (e) { /* 私密模式等情況忽略 */ } }
+  };
+  let memOpened = null;
+  const opened = () => memOpened || (memOpened = store.get('opened', []));
+  const markOpened = (t) => { const v = opened(); if (!v.includes(t)) { v.push(t); store.set('opened', v); } };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const gateOf = (k) => LIBRARY_GATES.find((g) => g.k === k);
+  let uid = 0;
+
+  // 畫一張書封（SVG）：漸層底、書脊、花紋、圖案、書名、作者
+  function cover(b) {
+    if (b.img) return `<img class="bx-img" src="${esc(b.img)}" alt="《${esc(b.t)}》書封">`;
+    const id = 'bxc' + (uid++), [c1, c2, ac] = b.pal;
+    const pats = {
+      stars: Array.from({ length: 14 }, (_, i) => `<circle cx="${(i * 37) % 112 + 6}" cy="${(i * 53) % 150 + 8}" r="${i % 3 ? 0.9 : 1.6}" fill="${ac}" opacity=".8"/>`).join(''),
+      rain: Array.from({ length: 16 }, (_, i) => `<line x1="${(i * 29) % 116}" y1="${(i * 41) % 150}" x2="${(i * 29) % 116 - 3}" y2="${(i * 41) % 150 + 9}" stroke="#fff" stroke-width="1" opacity=".35"/>`).join(''),
+      dots: Array.from({ length: 30 }, (_, i) => `<circle cx="${(i % 6) * 22 + 6}" cy="${Math.floor(i / 6) * 34 + 10}" r="2" fill="#fff" opacity=".18"/>`).join(''),
+      lines: Array.from({ length: 9 }, (_, i) => `<line x1="0" y1="${i * 20 + 4}" x2="120" y2="${i * 20 - 26}" stroke="#fff" stroke-width="5" opacity=".07"/>`).join(''),
+      waves: Array.from({ length: 6 }, (_, i) => `<path d="M0 ${i * 30 + 15} q15 -8 30 0 t30 0 t30 0 t30 0" fill="none" stroke="#fff" stroke-width="1.4" opacity=".22"/>`).join(''),
+      grid: Array.from({ length: 7 }, (_, i) => `<line x1="${i * 20}" y1="0" x2="${i * 20}" y2="170" stroke="#fff" stroke-width=".6" opacity=".12"/><line x1="0" y1="${i * 28}" x2="120" y2="${i * 28}" stroke="#fff" stroke-width=".6" opacity=".12"/>`).join('')
+    };
+    const lines = b.ct || [b.t];
+    const fs = Math.min(17, Math.floor(96 / Math.max(...lines.map((l) => [...l].length))));
+    const ty = 118 - (lines.length - 1) * (fs + 3) / 2;
+    return `<svg class="bx-svg" viewBox="0 0 120 170" role="img" aria-label="《${esc(b.t)}》書封">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
+        <radialGradient id="${id}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${ac}" stop-opacity=".55"/><stop offset="1" stop-color="${ac}" stop-opacity="0"/></radialGradient></defs>
+      <rect width="120" height="170" rx="4" fill="url(#${id})"/>
+      ${pats[b.pat] || ''}
+      <rect x="0" y="0" width="9" height="170" fill="#000" opacity=".22"/><rect x="9" y="0" width="1.5" height="170" fill="#fff" opacity=".25"/>
+      <rect x="15" y="8" width="98" height="154" rx="3" fill="none" stroke="${ac}" stroke-width="1" opacity=".7"/>
+      <circle cx="64" cy="62" r="34" fill="url(#${id}g)"/>
+      <circle cx="64" cy="62" r="24" fill="none" stroke="${ac}" stroke-width="1.2" opacity=".85"/>
+      <text x="64" y="72" text-anchor="middle" font-size="27">${b.m}</text>
+      ${lines.map((l, i) => `<text x="64" y="${ty + i * (fs + 3)}" text-anchor="middle" font-size="${fs}" font-weight="900" fill="#fff" style="font-family:var(--serif);letter-spacing:.06em">${esc(l)}</text>`).join('')}
+      <text x="64" y="152" text-anchor="middle" font-size="7.5" fill="${ac}" style="font-family:var(--sans);letter-spacing:.08em">${esc(b.a)}</text>
+    </svg>`;
+  }
+
+  function html() { return '<div class="bx" id="bx"></div>'; }
+
+  function init(root) {
+    if (!root) return;
+    let gate = null;
+    const count = () => `<div class="bx-trail">📚 你已經翻開 <b>${opened().length}</b> / ${LIBRARY_BOOKS.length} 本發光的書（紀錄只存在這台裝置的瀏覽器裡）</div>`;
+
+    function gates() {
+      root.innerHTML = `
+        <p class="bx-msg">😸 「你最近的心情是什麼顏色？」柴郡貓指了指樹上六道發光的門。</p>
+        <div class="bx-gates">${LIBRARY_GATES.map((g) => {
+          const n = LIBRARY_BOOKS.filter((b) => b.gate === g.k).length, done = LIBRARY_BOOKS.filter((b) => b.gate === g.k && opened().includes(b.t)).length;
+          return `<button class="bx-gate" type="button" data-gate="${g.k}" style="--g1:${g.c[0]};--g2:${g.c[1]}">
+            <span class="no">${g.no}</span><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><small>${esc(g.tags)}</small><span class="cnt">${done}/${n} 本</span></button>`;
+        }).join('')}</div>
+        ${count()}`;
+      root.querySelectorAll('[data-gate]').forEach((b) => { b.onclick = () => shelf(b.dataset.gate); });
+    }
+    function shelf(k) {
+      gate = gateOf(k);
+      const books = LIBRARY_BOOKS.filter((b) => b.gate === k);
+      root.innerHTML = `
+        <p class="bx-msg">${gate.ic} ${esc(gate.no)} ${esc(gate.name)}：樹枝上掛著幾本發光的書，挑一本點開吧。</p>
+        <div class="bx-branch" style="--g1:${gate.c[0]};--g2:${gate.c[1]}">${books.map((b, i) => `
+          <button class="bx-book ${opened().includes(b.t) ? 'read' : ''}" type="button" data-book="${esc(b.t)}" style="--d:${i * 0.4}s" title="翻開《${esc(b.t)}》">
+            <span class="str"></span><span class="cv">${cover(b)}</span><span class="nm">《${esc(b.t)}》</span></button>`).join('')}</div>
+        <div class="bx-row"><button class="btn" type="button" data-bx="gates">↩ 換一道文學入口</button></div>
+        ${count()}`;
+      root.querySelectorAll('[data-book]').forEach((b) => { b.onclick = () => open(LIBRARY_BOOKS.find((x) => x.t === b.dataset.book)); });
+      root.querySelector('[data-bx="gates"]').onclick = gates;
+    }
+    function open(b) {
+      markOpened(b.t);
+      const g = gateOf(b.gate), sib = LIBRARY_BOOKS.filter((x) => x.gate === b.gate);
+      const nxt = sib[(sib.indexOf(b) + 1) % sib.length];
+      root.innerHTML = `
+        <p class="bx-msg">📖 書本緩緩翻開……</p>
+        <div class="bx-open">
+          <div class="bx-page">
+            <p class="bx-gate-tag">${g.ic} ${esc(g.no)} ${esc(g.name)}</p>
+            <h3>《${esc(b.t)}》<small>${esc(b.a)}</small></h3>
+            <div class="bx-sec q"><span>🔮 好奇的提問</span><p>${esc(b.ask)}</p></div>
+            <div class="bx-sec"><span>📜 作品背景</span><p>${esc(b.bg)}</p></div>
+            <div class="bx-sec k"><span>🗝️ 繼續讀下去的線索</span><p>${esc(b.clue)}</p></div>
+            <p class="bx-end">……故事的答案，藏在書頁裡。到圖書館找找它吧！</p>
+          </div>
+          <div class="bx-flip" aria-hidden="true">${cover(b)}</div>
+        </div>
+        <div class="bx-row">
+          <button class="btn" type="button" data-bx="shelf">↩ 闔上書本</button>
+          <button class="btn" type="button" data-bx="next">➡️ 翻開下一本：《${esc(nxt.t)}》</button>
+          <button class="btn bx-main" type="button" data-bx="whisper">🌳 把讀後感說給樹洞聽</button>
+        </div>
+        ${count()}`;
+      root.querySelector('[data-bx="shelf"]').onclick = () => shelf(b.gate);
+      root.querySelector('[data-bx="next"]').onclick = () => open(nxt);
+      root.querySelector('[data-bx="whisper"]').onclick = () => {
+        window.WHISPER_HANDOFF = { kind: 'read', text: `我從「${g.name}」的入口，走進了《${b.t}》（${b.a}）。\n書裡問我：${b.ask}\n我的想法：` };
+        const el = document.querySelector('[data-item="c3"]');
+        if (el) el.click(); else window.open(window.WHISPER_PADLET, '_blank', 'noopener');
+      };
+      root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    gates();
   }
   return { html, init };
 })();
@@ -2141,16 +2478,16 @@ window.WhisperGame = (() => {
       });
     };
 
-    // 從「柴郡貓的文學岔路」帶過來的想法，或上次沒寫完的草稿
+    // 從「柴郡貓的怪問題」「藏在書頁裡的世界」帶過來的想法，或上次沒寫完的草稿
     const hand = window.WHISPER_HANDOFF; window.WHISPER_HANDOFF = null;
     const draft = memDraft || store.get('draft', null);
-    if (hand) { pickKind(hand.kind); ta.value = hand.text; count(); msg.textContent = '😸 柴郡貓把你在岔路上的相遇帶來了，接著寫下你的想法吧！'; }
+    if (hand) { pickKind(hand.kind); ta.value = hand.text; count(); msg.textContent = '😸 柴郡貓把你剛才的想法帶來了，接著寫下去吧！'; }
     else if (draft && draft.kind && draft.text) { pickKind(draft.kind, true); ta.value = draft.text; count(); msg.textContent = '📝 找到你上次沒寫完的悄悄話，繼續寫吧！'; }
     renderLeaves();
   }
   return { html, init };
 })();
-window.GAMES = Object.assign(window.GAMES || {}, { crossroads: window.CrossroadsGame, whisper: window.WhisperGame });
+window.GAMES = Object.assign(window.GAMES || {}, { oddq: window.OddQGame, library: window.LibraryGame, whisper: window.WhisperGame });
 </script>
 <script type="importmap">
 {
@@ -4804,7 +5141,7 @@ function selectItem(id) {
   relatedFlows = new Set(flowsOfIsland(it.isl).map((f) => f.fi));
   applySelection();
   openCard(itemCard(it), RANKS[it.idx + 1] || String(it.idx + 2), suitOf(it.isl));
-  if (it.d.game && window.GAMES && window.GAMES[it.d.game]) window.GAMES[it.d.game].init($('#cardBody .fx, #cardBody .px, #cardBody .rb, #cardBody .cx, #cardBody .wx'));
+  if (it.d.game && window.GAMES && window.GAMES[it.d.game]) window.GAMES[it.d.game].init($('#cardBody .fx, #cardBody .px, #cardBody .rb, #cardBody .cx, #cardBody .wx, #cardBody .bx'));
   flyFocus(new THREE.Vector3(it.wx, TOP + it.h * 0.35, it.wz), [1.6, 2.5, 3.2]);
 }
 function selectWalker(wi) {
