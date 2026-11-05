@@ -3480,8 +3480,8 @@ function setupRenderer() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.07;
   controls.enablePan = false;
-  controls.minPolarAngle = THREE.MathUtils.degToRad(25);
-  controls.maxPolarAngle = THREE.MathUtils.degToRad(70);
+  controls.minPolarAngle = THREE.MathUtils.degToRad(MIN_POLAR_DEG);
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(MAX_POLAR_DEG);
   controls.minDistance = 3;
   controls.maxDistance = 70;
   controls.target.set(CENTER.x, 0.4, CENTER.z);
@@ -4567,6 +4567,14 @@ Object.assign(ARCH, {
     });
     [[-0.23, 0.05], [0.23, 0.05]].forEach(([x, z]) => { a('cyl', x, 0.65, z, 0.08, 0.14, 0.08, '#fff0f5'); a('cone', x, 0.79, z, 0.1, 0.2, 0.1, M.lav); a('sphere', x, 0.98, z, 0.025, 0.025, 0.025, M.gold); });
     [-0.38, 0.38].forEach((x) => { a('cyl', x, 0.86, -0.33, 0.01, 0.2, 0.01, M.gold); a('box', x + 0.04, 1.0, -0.33, 0.07, 0.045, 0.006, M.rose); });
+    // 🚪 愛麗絲打開的小木門（城堡正面）
+    a('box', 0, 0.13, 0.264, 0.16, 0.12, 0.008, '#8a5a3c'); a('cyl', 0, 0.25, 0.26, 0.16, 0.008, 0.16, '#8a5a3c', 0, Math.PI / 2);
+    a('glowbox', 0, 0.13, 0.268, 0.12, 0.12, 0.006, '#ffe3a3'); a('cyl', 0, 0.25, 0.265, 0.12, 0.006, 0.12, '#ffe3a3', 0, Math.PI / 2);
+    a('rbox', -0.0318, 0.13, 0.323, 0.12, 0.17, 0.014, '#b07a4f', -1.0821);
+    [0.17, 0.26].forEach((y) => a('box', -0.0389, y, 0.3267, 0.124, 0.012, 0.006, '#5b4636', -1.0821));
+    a('box', -0.0385, 0.13, 0.3265, 0.004, 0.17, 0.004, '#8a5a3c', -1.0821);
+    a('sphere', -0.0236, 0.205, 0.3639, 0.02, 0.02, 0.02, M.gold);
+    a('torus', 0.045, 0.13, 0.4, 0.045, 0.045, 0.045, M.gold, 0, Math.PI / 2); a('cyl', 0.06, 0.137, 0.4, 0.01, 0.06, 0.01, M.gold, 0, 0, -Math.PI / 2); a('box', 0.11, 0.13, 0.408, 0.012, 0.012, 0.016, M.gold);
     heartTopiary(a, -0.33, 0.4, 0.2, '#f58fb0'); heartTopiary(a, 0.33, 0.4, 0.2, '#f58fb0');
     return 1.55;
   },
@@ -5325,7 +5333,7 @@ function buildIslandDressing(isl, rng) {
 function buildSeaProps() {
   const a = kit.add; kit.layer = 'main'; kit.owner = null;
   const rng = mulberry32(8080);
-  const spots = [[205, 19, 1.0], [250, 21, 0.8], [282.7, 9.12, 0.55], [120, 20, 0.9]];   // 第 3 座是燈塔島（在兔子洞左側稍前方的海上）
+  const spots = [[205, 19, 1.0], [250, 21, 0.8], [282.7, 9.4, 0.8], [120, 20, 0.9]];   // 第 3 座是燈塔島（在兔子洞左側稍前方的海上）
   spots.forEach(([deg, r, s], i) => {
     const an = (deg * Math.PI) / 180, x = CENTER.x + Math.sin(an) * r, z = CENTER.z + Math.cos(an) * r;
     kit.frame(x, WATER_Y, z, s, rng() * 6);
@@ -5923,6 +5931,8 @@ function goOverview(instant) {
   const dir = new THREE.Vector3(...OVERVIEW_DIR).normalize();
   flyTo(t.clone().addScaledVector(dir, overviewDistance()), t, instant);
 }
+// 視角上下可轉動的範圍（度）：越小越能從正上方往下看，越大越能壓低視角平視
+const MIN_POLAR_DEG = 10, MAX_POLAR_DEG = 84;
 function setBird(on) {
   state.bird = on;
   $('#tgBird').setAttribute('aria-pressed', String(on));
@@ -5931,7 +5941,7 @@ function setBird(on) {
     const t = new THREE.Vector3(CENTER.x, 0.4, CENTER.z);
     flyTo(t.clone().add(new THREE.Vector3(0.01, 42, 6)), t);
   } else {
-    controls.minPolarAngle = THREE.MathUtils.degToRad(25);
+    controls.minPolarAngle = THREE.MathUtils.degToRad(MIN_POLAR_DEG);
   }
 }
 const UP = { x: 0, y: 1, z: 0 };
