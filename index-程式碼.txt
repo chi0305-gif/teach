@@ -5325,7 +5325,7 @@ function buildIslandDressing(isl, rng) {
 function buildSeaProps() {
   const a = kit.add; kit.layer = 'main'; kit.owner = null;
   const rng = mulberry32(8080);
-  const spots = [[205, 19, 1.0], [250, 21, 0.8], [285, 8.6, 1.15], [120, 20, 0.9]];   // 第 3 座（i = 2）是燈塔小島，放在「兔子洞裡的祕密」旁邊
+  const spots = [[205, 19, 1.0], [250, 21, 0.8], [282.7, 9.12, 0.55], [120, 20, 0.9]];   // 第 3 座是燈塔島（在兔子洞左側稍前方的海上）
   spots.forEach(([deg, r, s], i) => {
     const an = (deg * Math.PI) / 180, x = CENTER.x + Math.sin(an) * r, z = CENTER.z + Math.cos(an) * r;
     kit.frame(x, WATER_Y, z, s, rng() * 6);
@@ -6663,7 +6663,7 @@ function pivot(parent, x, y, z) { const g = new THREE.Group(); g.position.set(x,
    ===================================================================== */
 const sailboats = [];
 function buildSailboats() {
-  const list = [[230, 15, 0.022, 0], [285, 23, -0.016, 1], [150, 16.5, 0.019, 2]];   // [起始角度, 半徑, 角速度, 樣式]
+  const list = [[230, 15.6, 0.021, 0], [285, 23, -0.016, 1], [150, 16.8, 0.019, 2]];   // [起始角度, 半徑, 角速度, 樣式]
   list.forEach(([deg, r, w, i]) => {
     const g = new THREE.Group(), a = gAdder(g);
     a('rbox', 0, 0, 0, 0.9, 0.2, 0.32, i % 2 ? C.cream : C.coral);
