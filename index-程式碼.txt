@@ -80,7 +80,7 @@ const DATA = {
         'I designed **“The Looking-Glass Sweet Potato’s Chinese World”** as a testing ground for putting students at the centre and making learning visible. From literacy inquiry in class to interactive web pages and generative experiences, I hope concrete, caring lesson design can accompany every learner who comes here: finding in words the strength to settle oneself, and keeping an independent, thinking mind amid the tides of technology.'
       ],
       items: [
-        { id: 'b1', name: '我是鄭名棋老師', en: 'I am Cheng Ming-chi', model: 'rabbithouse',
+        { id: 'b1', name: '我是誰？', en: 'Who am I?', model: 'rabbithouse',
           desc: '我是鄭名棋老師，一位在花蓮太平洋畔耕耘的高中現代與古典語文教師，同時身兼圖書館主任與校園數位內容推手。',
           descEn: 'I am Cheng Ming-chi, a high-school teacher of modern and classical Chinese on the Pacific coast of Hualien. I also serve as library director and help create the school’s digital content.' },
         { id: 'b2', name: '古典文學與新的畫筆', en: 'Classics and new brushes', model: 'scrollbrush',
@@ -6210,7 +6210,14 @@ function buildUI() {
   buildSideLists();
   delegate($('#cardBody')); delegate($('#panelTopics')); delegate($('#panelFlows'));
   $('#cardBody').addEventListener('click', (e) => { const t = e.target.closest('[data-media]'); if (t) selectMedia(Number(t.dataset.media)); });
-  $$('#panelTopics summary').forEach((s) => s.addEventListener('click', () => { const i = Number(s.parentElement.dataset.island); if (!s.parentElement.open) selectIsland(i); }));
+  // 點牌卡：打開這座島的內容，並展開底下的項目清單；再點一次同一張牌卡則收合
+  // （自己控制 open，避免瀏覽器預設的展開／收合把剛展開的清單又關起來）
+  $$('#panelTopics summary').forEach((s) => s.addEventListener('click', (e) => {
+    e.preventDefault();
+    const d = s.parentElement, i = Number(d.dataset.island);
+    if (d.open && sel && sel.type === 'island' && sel.island === islands[i]) { d.open = false; return; }
+    d.open = true; selectIsland(i);
+  }));
   $('#search').addEventListener('input', (e) => applySearch(e.target.value));
   const tabs = [['#tabTopics', '#panelTopics'], ['#tabFlows', '#panelFlows']];
   tabs.forEach(([t, p]) => $(t).addEventListener('click', () => {
