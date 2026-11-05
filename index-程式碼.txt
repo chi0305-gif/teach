@@ -855,6 +855,15 @@ body { font-size: 13px; }
 .cx-starters button:hover { background: var(--rose-pale); }
 .cx-flipbox textarea { width: 100%; min-height: 90px; margin-top: 8px; box-sizing: border-box; resize: vertical; border: 0; border-radius: 12px; padding: 10px 12px; font: 500 15px/1.75 var(--serif); color: #3f3245; background: #fff; box-shadow: inset 0 0 0 1.5px var(--lilac); }
 .cx-flipbox textarea:focus { outline: none; box-shadow: inset 0 0 0 2px var(--rose); }
+/* 學生資料：班級／座號／姓名（印在思辨卡上，方便老師辨認） */
+.cx-who { margin-top: 10px; background: #fff; border-radius: 12px; padding: 8px 10px 10px; box-shadow: inset 0 0 0 1.5px var(--lilac); }
+.cx-who .lb { font: 800 12px/1.4 var(--sans); color: var(--plum-2); margin-bottom: 6px; }
+.cx-who .row { display: grid; grid-template-columns: 1fr .7fr 1.4fr; gap: 6px; }
+.cx-who label { display: grid; gap: 2px; font: 700 11.5px/1.3 var(--sans); color: var(--muted); min-width: 0; }
+.cx-who input { width: 100%; box-sizing: border-box; min-width: 0; border: 0; border-radius: 8px; padding: 8px 9px; font: 700 15px/1.3 var(--sans); color: #3f3245; background: var(--lilac-pale); box-shadow: inset 0 0 0 1.5px var(--lilac); }
+.cx-who input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--rose); }
+.cx-who input.bad { box-shadow: inset 0 0 0 2px var(--rose-deep); background: var(--rose-pale); }
+.cx-card .stu { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 999px; background: #fff; font: 800 12px/1.6 var(--sans); color: var(--plum); box-shadow: inset 0 0 0 1.5px var(--gold); }
 .cx-flip-msg { min-height: 16px; margin: 6px 0 0; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--rose-deep); }
 .cx-card { margin-top: 10px; border-radius: 16px; padding: 14px; background: linear-gradient(150deg, var(--lilac-pale), var(--rose-pale)); box-shadow: var(--gold-frame), var(--card-shadow); animation: pxRise .6s cubic-bezier(.3, 1.4, .5, 1); }
 .cx-card .hd { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 800; color: var(--plum-2); letter-spacing: .06em; }
@@ -2266,6 +2275,14 @@ window.OddQGame = (() => {
           <p class="cx-flip-say">😸 柴郡貓把你的椅子轉了一百八十度：「現在換你替 <b>${esc(rival.who)}</b> 說話。用一兩句話，說服原本的自己。」</p>
           <div class="cx-starters">${FLIP_STARTERS.map((t) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join('')}</div>
           <textarea data-cx="flipText" maxlength="200" placeholder="例如：如果站在${esc(rival.who)}的角度，……"></textarea>
+          <div class="cx-who">
+            <div class="lb">🎓 寫上你的資料，老師才認得出這張卡是誰的</div>
+            <div class="row">
+              <label>班級<input data-cx="stuClass" maxlength="10" placeholder="例：301" autocomplete="off"></label>
+              <label>座號<input data-cx="stuSeat" maxlength="4" inputmode="numeric" placeholder="例：12" autocomplete="off"></label>
+              <label>姓名<input data-cx="stuName" maxlength="12" placeholder="你的名字" autocomplete="off"></label>
+            </div>
+          </div>
           <div class="cx-row"><button class="btn cx-main" type="button" data-cx="makeCard">✨ 完成思辨卡</button></div>
           <p class="cx-flip-msg" data-cx="flipMsg"></p>
         </div>
@@ -2277,15 +2294,27 @@ window.OddQGame = (() => {
       const fq = (k) => root.querySelector(`[data-cx="${k}"]`);
       fq('flip').onclick = () => { const b = fq('flipbox'); b.hidden = !b.hidden; if (!b.hidden) { fq('flipText').focus(); b.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } };
       root.querySelectorAll('[data-start]').forEach((b) => { b.onclick = () => { const ta = fq('flipText'); ta.value = b.dataset.start; ta.focus(); }; });
+      // 學生資料：記在這台裝置，下次不用重打
+      const who0 = store.get('who', {});
+      fq('stuClass').value = who0.cls || ''; fq('stuSeat').value = who0.seat || ''; fq('stuName').value = who0.name || '';
+      ['stuClass', 'stuSeat', 'stuName'].forEach((k) => { fq(k).oninput = () => fq(k).classList.remove('bad'); });
       fq('makeCard').onclick = () => {
         const txt = fq('flipText').value.trim();
         if ([...txt.replace(/\s/g, '')].length < 8) { fq('flipMsg').textContent = '柴郡貓搖搖尾巴：「再多說一點，對方還沒被你說服喔。」'; return; }
+        const stu = { cls: fq('stuClass').value.trim(), seat: fq('stuSeat').value.trim(), name: fq('stuName').value.trim() };
+        const miss = [['stuClass', stu.cls, '班級'], ['stuSeat', stu.seat, '座號'], ['stuName', stu.name, '姓名']].filter((m) => !m[1]);
+        if (miss.length) {
+          miss.forEach((m) => fq(m[0]).classList.add('bad')); fq(miss[0][0]).focus();
+          fq('flipMsg').textContent = `柴郡貓歪著頭：「這張卡是誰的？請填上${miss.map((m) => m[2]).join('、')}。」`; return;
+        }
+        store.set('who', stu);
         const n = addBadge();
-        const card = { q: x.q, type: t.name, lesson: x.lesson, gut: o.t, mine: mine.who, mineLine: mine.line || mine.work, rival: rival.who, rivalLine: rival.line || rival.work, flip: txt, read: x.read || '', next: x.next };
+        const card = { q: x.q, type: t.name, lesson: x.lesson, gut: o.t, mine: mine.who, mineLine: mine.line || mine.work, rival: rival.who, rivalLine: rival.line || rival.work, flip: txt, read: x.read || '', next: x.next, stu };
         fq('flipbox').hidden = true;
         fq('cardOut').innerHTML = `
           <div class="cx-card">
             <div class="hd"><span>♠ 柴郡貓的思辨卡</span><span>🏅 思辨徽章 ×${n}</span></div>
+            <div class="stu">🎓 ${esc(stuLabel(stu))}</div>
             <div class="q"><small style="display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px">${esc(card.type)} · ${esc(card.lesson)}</small>${esc(card.q)}</div>
             <div class="cx-side a"><b>我的立場</b>${esc(card.gut)}<small>和 ${esc(card.mine)} 同一邊：「${esc(card.mineLine)}」</small></div>
             <div class="cx-side b"><b>換邊站：替 ${esc(card.rival)} 說話</b>${esc(card.flip)}<small>${esc(card.rival)}：「${esc(card.rivalLine)}」</small></div>
@@ -2303,8 +2332,9 @@ window.OddQGame = (() => {
       if (first && seen().length === ODDQ.length) confetti();
       root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+    function stuLabel(s) { return `${s.cls} 班　${s.seat} 號　${s.name}`; }
     function copyCard(c, btn) {
-      const t = `【柴郡貓的思辨卡】\n課次：${c.type} ${c.lesson}\n問題：${c.q}\n我的立場：${c.gut}（和${c.mine}同一邊）\n換邊站，替${c.rival}說話：${c.flip}\n回到課文：${c.read}\n柴郡貓追問：${c.next}`;
+      const t = `【柴郡貓的思辨卡】\n學生：${stuLabel(c.stu)}\n課次：${c.type} ${c.lesson}\n問題：${c.q}\n我的立場：${c.gut}（和${c.mine}同一邊）\n換邊站，替${c.rival}說話：${c.flip}\n回到課文：${c.read}\n柴郡貓追問：${c.next}`;
       const ok = () => { btn.textContent = '✅ 已複製'; };
       const fb = () => { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); ok(); } catch (e) { btn.textContent = '複製失敗'; } a.remove(); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fb); else fb();
@@ -2331,8 +2361,10 @@ window.OddQGame = (() => {
       g.textBaseline = 'top';
       g.font = `800 34px ${sans}`; g.fillStyle = '#a084c4'; g.fillText('♠ 柴郡貓的思辨卡 · ' + c.type, 100, 100);
       g.textAlign = 'right'; g.fillStyle = '#d95f82'; g.fillText('🏅 ×' + n, W - 100, 100); g.textAlign = 'left';
-      wrap(c.lesson, 100, 150, W - 200, 36, `700 28px ${sans}`, '#a08aa3', 1);
-      let y = wrap(c.q, 100, 205, W - 200, 62, `900 46px ${serif}`, '#6b4c6e', 4) + 30;
+      g.font = `800 30px ${sans}`; const sl = '🎓 ' + stuLabel(c.stu), sw = g.measureText(sl).width + 48;
+      box(100, 150, Math.min(sw, W - 200), 52, '#ffffff', '#ecc77a'); g.fillStyle = '#6b4c6e'; g.fillText(sl, 124, 161);
+      wrap(c.lesson, 100, 222, W - 200, 36, `700 28px ${sans}`, '#a08aa3', 1);
+      let y = wrap(c.q, 100, 272, W - 200, 62, `900 46px ${serif}`, '#6b4c6e', 4) + 30;
       const side = (label, body, foot, fill, stroke, labelCol) => {
         const top = y; g.save(); g.globalAlpha = 0; let yy = wrap(body, 140, top + 90, W - 280, 52, `700 38px ${serif}`, '#000', 5); yy = wrap(foot, 140, yy + 10, W - 280, 40, `500 28px ${sans}`, '#000', 3); g.restore();
         box(100, top, W - 200, yy - top + 30, fill, stroke);
@@ -2345,7 +2377,7 @@ window.OddQGame = (() => {
       side(`換邊站：替 ${c.rival} 說話`, c.flip, `${c.rival}：「${c.rivalLine}」`, '#fff4d6', '#ecc77a', '#d95f82');
       wrap('🐾 柴郡貓追問：' + c.next, 100, Math.min(y, H - 260), W - 200, 46, `700 32px ${sans}`, '#6b4c6e', 3);
       g.font = `600 26px ${sans}`; g.fillStyle = '#a08aa3'; g.textAlign = 'center'; g.fillText('鏡中番薯的國文世界 · 柴郡貓的藏書樹', W / 2, H - 110);
-      const a = document.createElement('a'); a.download = '柴郡貓的思辨卡.png'; a.href = cv.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
+      const a = document.createElement('a'); a.download = `思辨卡_${c.stu.cls}班_${c.stu.seat}號_${c.stu.name}.png`.replace(/[\\/:*?"<>|]/g, ''); a.href = cv.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
     }
     function confetti(n = 22) {
       const e = ['😸', '🌙', '📜', '🐟', '✨', '♠'];
