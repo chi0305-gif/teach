@@ -4599,7 +4599,7 @@ function buildIslandDressing(isl, rng) {
 function buildSeaProps() {
   const a = kit.add; kit.layer = 'main'; kit.owner = null;
   const rng = mulberry32(8080);
-  const spots = [[205, 19, 1.0], [250, 21, 0.8], [237.5, 13.0, 1.15], [120, 20, 0.9]];   // 第 3 座是燈塔島（在兔子洞左後方的海上，一打開網頁就看得到）
+  const spots = [[205, 19, 1.0], [250, 21, 0.8], [338.2, 7.54, 0.55], [120, 20, 0.9]];   // 第 3 座是燈塔島（在兔子洞左前方的海上，一打開網頁就看得到）
   spots.forEach(([deg, r, s], i) => {
     const an = (deg * Math.PI) / 180, x = CENTER.x + Math.sin(an) * r, z = CENTER.z + Math.cos(an) * r;
     kit.frame(x, WATER_Y, z, s, rng() * 6);
