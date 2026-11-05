@@ -39,7 +39,7 @@ const DATA = {
     traveler:   { zh: '旅人', en: 'Traveler' }
   },
   islands: [
-    { id: 'rose', suit: '♥', name: '紅心皇后的玫瑰園', en: 'The Queen of Hearts’ Rose Garden', axial: [0, 0],
+    { id: 'rose', short: '玫瑰園', shortEn: 'Rose Garden', suit: '♥', name: '紅心皇后的玫瑰園', en: 'The Queen of Hearts’ Rose Garden', axial: [0, 0],
       color: '#f48fb1', ground: { pattern: 'checker', color: '#ffe6ef' }, tree: 'topiary',
       landmark: 'castle', decor: ['roses', 'heartbush'],
       story: { zh: '紅心皇后的城堡', en: 'The Queen of Hearts’ Castle', char: 'queen' },
@@ -64,7 +64,7 @@ const DATA = {
             ]
           } }
       ] },
-    { id: 'rabbit', suit: '♣', name: '兔子洞裡的祕密', en: 'The Secret in the Rabbit-Hole', axial: [-1, 0],
+    { id: 'rabbit', short: '兔子洞', shortEn: 'Rabbit-Hole', suit: '♣', name: '兔子洞裡的祕密', en: 'The Secret in the Rabbit-Hole', axial: [-1, 0],
       color: '#a8e6cf', ground: { pattern: 'speckle', color: '#e6f8f0' }, tree: 'sakura',
       landmark: 'rabbithole', decor: ['clock', 'mushrooms'],
       story: { zh: '掉進兔子洞', en: 'Down the Rabbit-Hole', char: 'whiteRabbit' },
@@ -90,7 +90,7 @@ const DATA = {
           desc: '設計「鏡中番薯的國文世界」，是我實踐「以學生為中心、讓學習看得見」的實驗場域。從課堂素養探究到互動網頁與生成式體驗的落地，我希望透過具體、有溫度的教學設計，陪伴每一位走進這裡的學習者：在文字中找到安頓自我的力量，在科技浪潮中保有獨立思辨的靈魂。',
           descEn: 'I designed “The Looking-Glass Sweet Potato’s Chinese World” as a testing ground for putting students at the centre and making learning visible. I hope concrete, caring lesson design can accompany every learner who comes here.' }
       ] },
-    { id: 'hatter', suit: '♦', name: '瘋帽子的百寶箱', en: 'The Mad Hatter’s Treasure Chest', axial: [0, 1],
+    { id: 'hatter', short: '百寶箱', shortEn: 'Treasure Chest', suit: '♦', name: '瘋帽子的百寶箱', en: 'The Mad Hatter’s Treasure Chest', axial: [0, 1],
       color: '#ffe5a0', ground: { pattern: 'checker', color: '#fff7e0' }, tree: 'lollipop',
       landmark: 'treasurechest', decor: ['teapot', 'teacup'],
       story: { zh: '瘋帽客的茶會', en: 'A Mad Tea-Party', char: 'hatter' },
@@ -109,11 +109,11 @@ const DATA = {
           desc: '「我要遲到了！」白兔先生掏出懷錶：30 秒成語挑戰、60 秒文意快問快答、45 秒古文找錯字——用零碎時間玩國文。',
           descEn: 'Quick timed quizzes on idioms, classical word meanings and spotting typos (in Chinese).' }
       ] },
-    { id: 'cheshire', suit: '♠', name: '柴郡貓的藏書樹', en: 'The Cheshire Cat’s Book Tree', axial: [1, -1],
+    { id: 'cheshire', short: '藏書樹', shortEn: 'Book Tree', suit: '♠', name: '柴郡貓的藏書樹', en: 'The Cheshire Cat’s Book Tree', axial: [1, -1],
       color: '#c9b6f2', ground: { pattern: 'stripe', color: '#f1ebfd' }, tree: 'jacaranda',
       landmark: 'booktree', decor: ['mushrooms', 'signpost'],
       story: { zh: '柴郡貓的森林', en: 'The Cheshire Cat’s Wood', char: 'cheshire' },
-      summary: '在這座不太尋常的森林裡，書本不只用來閱讀，問題也不一定有答案。柴郡貓咧嘴一笑：「別急著找方向，有時候，迷路才會遇見最精彩的故事。」', summaryEn: 'In this rather unusual wood, books are not only for reading, and questions do not always have answers. The Cheshire Cat grins: “Don’t rush to find your way. Sometimes getting lost is how you meet the best stories.”',
+      summary: '在這座不太尋常的森林裡，書本不只用來閱讀，問題也不一定有答案。柴郡貓咧嘴一笑：「別急著找方向，有時候，迷路才會遇見最精彩的故事。」', summaryEn: 'In this rather unusual wood, books are not only for reading, and questions do not always have answers. The Cheshire Cat grins: “Don’t rush to find your way. Sometimes you have to get lost to meet the best stories.”',
       items: [
         { id: 'c1', name: '樹梢上的魔法課', en: 'Magic Lessons in the Treetops', model: 'classroom',
           desc: '爬上藏書樹的樹梢，番薯老師的每一堂國文課都掛在這裡，像一本本等著被施咒的魔法書。挑一堂，開始上課吧！', descEn: 'Climb to the top of the book tree: every one of Teacher Sweet Potato’s Chinese lessons hangs here like a spellbook waiting to be opened. Pick one and class begins!',
@@ -930,6 +930,106 @@ body { font-size: 13px; }
 @media (prefers-reduced-motion: reduce) { .bx * { animation: none !important; transition: none !important; } .bx-flip { display: none; } }
 @keyframes wxLeaf { from { transform: translateY(-14px) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .cx *, .wx * { animation: none !important; transition: none !important; } }
+
+/* =====================================================================
+   跨裝置優化：手機（直／橫）、平板、電腦
+   ===================================================================== */
+/* 操作提示：依輸入方式顯示「滑鼠」或「觸控」說法 */
+.hint-touch { display: none; }
+@media (pointer: coarse) { .hint-mouse { display: none; } .hint-touch { display: inline; } }
+
+/* 島名短標籤（窄螢幕用） */
+.pill .sn { display: none; }
+
+/* 觸控裝置：外觀不變，但手指可點範圍至少 44px */
+@media (pointer: coarse) {
+  .btn { min-height: 44px; min-width: 44px; }
+  .tabs .btn { min-height: 42px; }
+  .chip { min-height: 38px; }
+  .list-item, .topic summary, .topic li button { min-height: 44px; }
+  .pin::after, .pill::after { content: ""; position: absolute; inset: -10px; border-radius: 999px; }
+  .pin:hover { transform: none; }
+  .btn:hover { transform: none; }
+}
+
+/* ---------- 手機與小平板（≤ 800px） ---------- */
+@media (max-width: 800px) {
+  /* 上方工具列：圖示下方加文字 */
+  .tools .btn { min-width: 46px; min-height: 46px; padding: 3px 4px; gap: 2px; }
+  .tools .btn span { display: block; font-size: 10.5px; line-height: 1; font-weight: 600; }
+  .tools .btn svg { width: 19px; height: 19px; }
+
+  /* 底部卡片／清單：滿版寬度 */
+  .card, .side { width: auto; max-height: none; }
+  .card { height: 50%; }
+  .side { height: 56%; }
+  .sheet-handle { height: 30px; }
+  .sheet-handle::before { font-size: 12px; }
+  .sheet-handle::after { content: ""; position: absolute; left: 50%; top: 21px; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: var(--lilac); }
+
+  /* 小字放大 */
+  .idx b { font-size: 15px; } .idx i { font-size: 13px; }
+  .card .eyebrow { font-size: 12px; }
+  .story-tag { font-size: 12.5px; }
+  .card .desc, .card .lead, .bio p { font-size: 15px; }
+  .pin { width: 28px; height: 28px; font-size: 14px; }
+  .pill { font-size: 13px; padding: 4px 11px 4px 15px; }
+
+  /* 「時間」面板：整齊的按鈕格，不再被右下按鈕蓋住 */
+  .hud.open {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 2px;
+    width: min(340px, calc(100vw - 24px)); max-width: none;
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px)); padding: 12px 10px 10px;
+  }
+  .hud .clock { grid-column: 1 / -1; padding: 0 4px 6px; border-bottom: 2px dotted var(--cheshire); margin-bottom: 4px; }
+  .hud #timeBtns, .hud .hud-group[aria-label] { display: contents; }
+  .hud .hud-group:last-of-type { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; max-width: none; }
+  .hud .tbtn, .hud .tg { min-width: 0; min-height: 54px; padding: 4px 2px; }
+  .hud .tbtn span, .hud .tg span { font-size: 11.5px; white-space: nowrap; }
+  .hud-toggle { min-height: 48px; }
+}
+
+/* ---------- 窄手機（≤ 600px）：島名用短名，避免互相重疊 ---------- */
+@media (max-width: 600px), (max-height: 500px) and (orientation: landscape) {
+  .pill .nm { display: none; }
+  .pill .sn { display: inline; }
+  .pill.num .sn { display: none; }
+}
+
+/* ---------- 小平板直向（601–800px）：卡片改成左下浮動面板，不擋整個畫面 ---------- */
+@media (min-width: 601px) and (max-width: 800px) and (min-height: 501px) {
+  .card, .side {
+    left: calc(12px + env(safe-area-inset-left, 0px)); right: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    width: min(420px, calc(100vw - 24px)); border-radius: 22px;
+  }
+  .card { height: 52%; }
+  .side { height: 58%; }
+}
+
+/* ---------- 手機橫向／矮螢幕：卡片與清單改成左右側欄 ---------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .brand #brandSub, .brand .eyebrow { display: none; }
+  .topbar { top: calc(8px + env(safe-area-inset-top, 0px)); }
+  .topbar .brand { padding: 6px 14px 6px 18px; }
+  .brand h1 { font-size: 17px; }
+  .sheet-handle { display: none !important; }
+  .card, .side { animation: none; border-radius: 18px; height: auto !important; max-height: none; }
+  .card {
+    top: calc(64px + env(safe-area-inset-top, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    left: auto; right: calc(8px + env(safe-area-inset-right, 0px)); width: min(380px, 48vw);
+  }
+  .card-scroll { padding-top: 30px; }
+  .side {
+    top: calc(64px + env(safe-area-inset-top, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    left: calc(8px + env(safe-area-inset-left, 0px)); right: auto; width: min(300px, 42vw);
+  }
+  body.sheet-open .hud-toggle { display: none; }
+  .hud.open { bottom: calc(66px + env(safe-area-inset-bottom, 0px)); padding: 8px; }
+  .hud .clock { display: none; }
+  .hud .tbtn, .hud .tg { min-height: 46px; }
+  .hud-toggle { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .legend { display: none; }
+}
 </style>
 
 </head>
@@ -987,7 +1087,7 @@ body { font-size: 13px; }
     <svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="10" height="14" rx="2" transform="rotate(-10 8.5 12.5)"/><rect x="10" y="4" width="10" height="14" rx="2"/><path d="M15 9.2c-.8-1.1-2.4-.4-1.9.9.4.8 1.9 1.9 1.9 1.9s1.5-1.1 1.9-1.9c.5-1.3-1.1-2-1.9-.9z"/></svg><span data-en="List">清單</span>
   </button>
   <button class="btn" id="btnHelp" title="操作說明" data-en-label="How to use">
-    <svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 7 0 0 1 17 0z"/><path d="M9.5 12v6a2.5 2.5 0 0 0 5 0v-6"/><circle cx="8.5" cy="8.6" r=".9"/><circle cx="15.3" cy="9" r=".9"/><circle cx="12" cy="6.6" r=".9"/></svg><span>?</span>
+    <svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 7 0 0 1 17 0z"/><path d="M9.5 12v6a2.5 2.5 0 0 0 5 0v-6"/><circle cx="8.5" cy="8.6" r=".9"/><circle cx="15.3" cy="9" r=".9"/><circle cx="12" cy="6.6" r=".9"/></svg><span data-en="Help">說明</span>
   </button>
 </nav>
 </div>
@@ -1078,7 +1178,7 @@ body { font-size: 13px; }
     <p class="eyebrow" data-en="FOLLOW THE WHITE RABBIT">FOLLOW THE WHITE RABBIT · 跟著白兔走</p>
     <h2 id="obTitle" data-en="Three steps into the Chinese world">三步驟走進國文世界</h2>
     <ol class="steps">
-      <li data-rank="A"><div><b data-en="Drag to look around">拖曳旋轉、滾輪縮放</b><span data-en="Orbit the city with mouse or touch. Arrow keys also rotate the view.">用滑鼠或手指環繞整座城市，方向鍵也能轉動視角。</span></div></li>
+      <li data-rank="A"><div><b><span class="hint-mouse" data-en="Drag to look around, scroll to zoom">拖曳旋轉、滾輪縮放</span><span class="hint-touch" data-en="Drag to turn, pinch to zoom">單指拖曳旋轉、雙指縮放</span></b><span data-en="Orbit the city with mouse or touch. Arrow keys also rotate the view.">用滑鼠或手指環繞整座城市，方向鍵也能轉動視角。</span></div></li>
       <li data-rank="2"><div><b data-en="Tap an island or a model">點一座島或一個小模型</b><span data-en="Each island is one card: ♥ ♣ ♦ ♠. The small models on it are what is inside. Tap to turn the card over.">每座島是一張牌卡：♥ ♣ ♦ ♠，島上的小模型就是裡面的內容，點了會翻開卡片。</span></div></li>
       <li data-rank="3"><div><b data-en="Follow the walkers">跟著小人走</b><span data-en="Little people carry work and materials between the islands. Turn on “Links” to see their routes.">小人在島與島之間搬運作品與教材，打開「協作線」就看得到它們的路線。</span></div></li>
     </ol>
@@ -3340,7 +3440,7 @@ async function init() {
   // 「柴郡貓的怪問題」本題連結：網址最後是 #oddq=題目代號 時，直接打開那一題
   const oddqLink = (location.hash.match(/^#oddq=([\w-]+)/) || [])[1];
   if (oddqLink && itemById.c2) { window.ODDQ_START = oddqLink; selectItem('c2'); }
-  else if (store.get('policyIsland.onboarded') !== '1') openOnboard();
+  else openOnboard();   // 每次進入網頁都先顯示操作說明（右上「?」按鈕也可以再打開）
   requestAnimationFrame(loop);
 }
 
@@ -5225,7 +5325,7 @@ function buildIslandDressing(isl, rng) {
 function buildSeaProps() {
   const a = kit.add; kit.layer = 'main'; kit.owner = null;
   const rng = mulberry32(8080);
-  const spots = [[205, 19, 1.0], [250, 21, 0.8], [282.7, 9.12, 0.55], [120, 20, 0.9]];   // 第 3 座是燈塔島（在兔子洞左側稍前方的海上）
+  const spots = [[205, 19, 1.0], [250, 21, 0.8], [285, 8.6, 1.15], [120, 20, 0.9]];   // 第 3 座（i = 2）是燈塔小島，放在「兔子洞裡的祕密」旁邊
   spots.forEach(([deg, r, s], i) => {
     const an = (deg * Math.PI) / 180, x = CENTER.x + Math.sin(an) * r, z = CENTER.z + Math.cos(an) * r;
     kit.frame(x, WATER_Y, z, s, rng() * 6);
@@ -5710,7 +5810,7 @@ function buildLabels() {
     const el = document.createElement('button');
     el.className = 'pill'; el.type = 'button';
     el.style.setProperty('--c', isl.d.color);
-    el.innerHTML = `<span class="no suit ${isRed(suitOf(isl)) ? 'red' : ''}">${esc(suitOf(isl))}</span><span class="nm">${esc(tr(isl.d.name, isl.d.en))}</span>`;
+    el.innerHTML = `<span class="no suit ${isRed(suitOf(isl)) ? 'red' : ''}">${esc(suitOf(isl))}</span><span class="nm">${esc(tr(isl.d.name, isl.d.en))}</span><span class="sn">${esc(tr(isl.d.short || isl.d.name, isl.d.shortEn || isl.d.en))}</span>`;
     el.setAttribute('aria-label', islandLabel(isl));
     el.addEventListener('click', (e) => { e.stopPropagation(); selectIsland(isl.i); });
     const obj = new CSS2DObject(el);
@@ -6185,18 +6285,20 @@ function delegate(root) {
   });
 }
 function makeSheet(el, handle, onClose) {
-  let y0 = null, h0 = 0;
+  let y0 = null, h0 = 0, moved = false;
   handle.addEventListener('pointerdown', (e) => {
     if (!isMobileNow()) return;
-    y0 = e.clientY; h0 = el.getBoundingClientRect().height;
+    y0 = e.clientY; h0 = el.getBoundingClientRect().height; moved = false;
     try { handle.setPointerCapture(e.pointerId); } catch (err) {}
   });
   handle.addEventListener('pointermove', (e) => {
     if (y0 === null) return;
-    el.style.height = clamp(h0 + (y0 - e.clientY), 60, innerHeight - 6) + 'px';
+    if (Math.abs(y0 - e.clientY) > 4) moved = true;
+    if (moved) el.style.height = clamp(h0 + (y0 - e.clientY), 60, innerHeight - 6) + 'px';
   });
   const up = () => {
     if (y0 === null) return; y0 = null;
+    if (!moved) { el.style.height = h0 > innerHeight * 0.7 ? '' : 'calc(100% - 6px)'; return; }
     const h = el.getBoundingClientRect().height;
     if (h > innerHeight * 0.78) el.style.height = 'calc(100% - 6px)';
     else if (h < innerHeight * 0.16) { el.style.height = ''; onClose(); }
@@ -6276,7 +6378,7 @@ function buildUI() {
   });
   const onRM = (e) => { RM = !!e.matches; flowStaticU.value = RM ? 1 : 0; if (RM) flight = null; dirty = true; };
   if (mqRM.addEventListener) mqRM.addEventListener('change', onRM); else if (mqRM.addListener) mqRM.addListener(onRM);
-  window.addEventListener('resize', () => { if (!isMobileNow()) { $('#card').style.height = ''; $('#side').style.height = ''; } syncSheetState(); });
+  window.addEventListener('resize', () => { labelItems.forEach((L) => { L.wFull = 0; }); if (!isMobileNow()) { $('#card').style.height = ''; $('#side').style.height = ''; } syncSheetState(); });
 }
 
 /* ---------- raycast ---------- */
@@ -6561,7 +6663,7 @@ function pivot(parent, x, y, z) { const g = new THREE.Group(); g.position.set(x,
    ===================================================================== */
 const sailboats = [];
 function buildSailboats() {
-  const list = [[230, 15.6, 0.021, 0], [285, 23, -0.016, 1], [150, 16.8, 0.019, 2]];   // [起始角度, 半徑, 角速度, 樣式]
+  const list = [[230, 15, 0.022, 0], [285, 23, -0.016, 1], [150, 16.5, 0.019, 2]];   // [起始角度, 半徑, 角速度, 樣式]
   list.forEach(([deg, r, w, i]) => {
     const g = new THREE.Group(), a = gAdder(g);
     a('rbox', 0, 0, 0, 0.9, 0.2, 0.32, i % 2 ? C.cream : C.coral);
