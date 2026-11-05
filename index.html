@@ -113,7 +113,7 @@ const DATA = {
       color: '#c9b6f2', ground: { pattern: 'stripe', color: '#f1ebfd' }, tree: 'jacaranda',
       landmark: 'booktree', decor: ['mushrooms', 'signpost'],
       story: { zh: '柴郡貓的森林', en: 'The Cheshire Cat’s Wood', char: 'cheshire' },
-      summary: '樹梢上的魔法課、柴郡貓的怪問題、樹洞裡的悄悄話，與藏在書頁裡的世界', summaryEn: 'Magic lessons in the treetops, the Cheshire Cat’s odd questions, whispers in the tree hollow and worlds hidden in the pages',
+      summary: '在這座不太尋常的森林裡，書本不只用來閱讀，問題也不一定有答案。柴郡貓咧嘴一笑：「別急著找方向，有時候，迷路才會遇見最精彩的故事。」', summaryEn: 'In this rather unusual wood, books are not only for reading, and questions do not always have answers. The Cheshire Cat grins: “Don’t rush to find your way. Sometimes you have to get lost to meet the best stories.”',
       items: [
         { id: 'c1', name: '樹梢上的魔法課', en: 'Magic Lessons in the Treetops', model: 'classroom',
           desc: '爬上藏書樹的樹梢，番薯老師的每一堂國文課都掛在這裡，像一本本等著被施咒的魔法書。挑一堂，開始上課吧！', descEn: 'Climb to the top of the book tree: every one of Teacher Sweet Potato’s Chinese lessons hangs here like a spellbook waiting to be opened. Pick one and class begins!',
@@ -4699,7 +4699,7 @@ function buildIslandDressing(isl, rng) {
 function buildSeaProps() {
   const a = kit.add; kit.layer = 'main'; kit.owner = null;
   const rng = mulberry32(8080);
-  const spots = [[205, 19, 1.0], [250, 21, 0.8], [305, 19.5, 1.15], [120, 20, 0.9]];
+  const spots = [[205, 19, 1.0], [250, 21, 0.8], [285, 8.6, 1.15], [120, 20, 0.9]];   // 第 3 座（i = 2）是燈塔小島，放在「兔子洞裡的祕密」旁邊
   spots.forEach(([deg, r, s], i) => {
     const an = (deg * Math.PI) / 180, x = CENTER.x + Math.sin(an) * r, z = CENTER.z + Math.cos(an) * r;
     kit.frame(x, WATER_Y, z, s, rng() * 6);
