@@ -3817,7 +3817,8 @@ function setupRenderer() {
   // 觸控板、Mac 滑鼠或無段式滾輪一撥就會送出幾十個事件，一下子放到超大或縮到超小。
   // 這裡改成「依實際滾動量」縮放，並且平滑地慢慢靠近目標距離。
   window.addEventListener('wheel', (e) => {
-    if (e.target !== renderer.domElement) return;
+    // 滑鼠在 3D 畫面或島嶼名牌上時都由這裡處理（避免按著 Ctrl 滾動時，變成整個瀏覽器網頁縮小）
+    if (!stage.contains(e.target)) return;
     e.preventDefault(); e.stopImmediatePropagation();
     let dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
     if (e.ctrlKey) dy *= 2.5; // 觸控板雙指捏合
