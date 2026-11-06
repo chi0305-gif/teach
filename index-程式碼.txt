@@ -3813,11 +3813,26 @@ function setupRenderer() {
   controls.target.set(CENTER.x, 0.4, CENTER.z);
   controls.addEventListener('change', () => { dirty = true; });
   controls.addEventListener('start', () => { userMoved = true; });
+  // 滑鼠滾輪縮放：OrbitControls 內建的滾輪是「每個事件固定縮放 5%」，
+  // 觸控板、Mac 滑鼠或無段式滾輪一撥就會送出幾十個事件，一下子放到超大或縮到超小。
+  // 這裡改成「依實際滾動量」縮放，並且平滑地慢慢靠近目標距離。
+  window.addEventListener('wheel', (e) => {
+    if (e.target !== renderer.domElement) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    let dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
+    if (e.ctrlKey) dy *= 2.5; // 觸控板雙指捏合
+    dy = clamp(dy, -120, 120);
+    flight = null; userMoved = true;
+    const cur = camera.position.distanceTo(controls.target);
+    wheelGoal = clamp((wheelGoal || cur) * Math.exp(dy * 0.0009), controls.minDistance, controls.maxDistance);
+    dirty = true;
+  }, { capture: true, passive: false });
 
   const ro = new ResizeObserver(() => onResize());
   ro.observe(stage);
 }
 let userMoved = false;
+let wheelGoal = 0; // 滾輪縮放的目標距離（0 = 沒有在縮放）
 function onResize() {
   const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
   if (!w || !h) return;
@@ -6686,7 +6701,7 @@ function buildUI() {
   setList(state.list);
   // 點擊：移動 ≤ 6px 才 raycast；按下即取消飛行
   const cv = renderer.domElement; let down = null;
-  cv.addEventListener('pointerdown', (e) => { flight = null; down = { x: e.clientX, y: e.clientY }; });
+  cv.addEventListener('pointerdown', (e) => { flight = null; wheelGoal = 0; down = { x: e.clientX, y: e.clientY }; });
   cv.addEventListener('pointerup', (e) => {
     if (!down) return;
     const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
@@ -7044,6 +7059,17 @@ function loop(now) {
     controls.target.lerpVectors(flight.t0, flight.t1, e);
     if (k >= 1) flight = null;
     dirty = true;
+  }
+  if (wheelGoal) {
+    // 平滑靠近滾輪的目標距離（約 0.2 秒）
+    if (flight) wheelGoal = 0;
+    else {
+      const off = camera.position.clone().sub(controls.target), d = off.length();
+      const nd = d + (wheelGoal - d) * Math.min(1, dt * 14);
+      if (Math.abs(wheelGoal - nd) < 0.005) { off.setLength(wheelGoal); wheelGoal = 0; } else off.setLength(nd);
+      camera.position.copy(controls.target).add(off);
+      dirty = true;
+    }
   }
   if (controls.update()) dirty = true;
   if (dirty) renderNow();
