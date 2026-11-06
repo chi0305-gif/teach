@@ -579,6 +579,33 @@ body { font-size: 13px; }
 .topbar { position: fixed; z-index: 10; top: calc(16px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px)); display: flex; align-items: center; gap: 10px; }
 .topbar .brand { position: relative; top: auto; left: auto; right: auto; padding: 10px 18px 10px 22px; }
 .topbar .tools { position: static; padding: 4px; border-radius: 14px; background: var(--glass); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3); border: 1px solid rgba(255, 255, 255, .8); box-shadow: var(--card-shadow), var(--gold-frame); }
+/* 撲克牌目錄與牌卡：恢復原本較大的字級與按鈕（不套用上面的精簡尺寸） */
+.card, .side { font-size: 14px; }
+.card .btn, .side .btn { min-height: 44px; min-width: 44px; font-size: 13px; padding: 0 12px; }
+.idx b { font-size: 19px; } .idx i { font-size: 16px; }
+.idx.tl { top: 14px; left: 16px; } .idx.br { bottom: 14px; right: 16px; }
+.card-scroll { padding: 46px 24px 44px; }
+.card-close { top: 8px; right: 8px; }
+.card h2 { font-size: 25px; line-height: 1.25; margin: 6px 0 4px; }
+.card .lead { font-size: 15px; }
+.card .desc { font-size: 15px; }
+.card h3 { margin: 18px 0 8px; }
+.story-tag { font-size: 12.5px; padding: 3px 11px; }
+.bio p { font-size: 15px; }
+.list-item { min-height: 46px; padding: 8px 12px; font-size: 14.5px; }
+.chip { font-size: 13px; min-height: 34px; padding: 6px 12px; }
+.tile b { font-size: 30px; }
+.side-head { padding: 12px 14px 10px; gap: 10px; }
+.search { min-height: 44px; font-size: 14px; }
+.tabs .btn { min-height: 40px; font-size: 13.5px; }
+.side-body { padding: 10px 12px 16px; }
+.topic summary { min-height: 48px; padding: 6px 12px; font-size: 15px; }
+.topic .no.suit { font-size: 16px !important; }
+@media (min-width: 801px) {
+  .card { width: 380px; border-radius: 20px; }
+  .side { width: 318px; border-radius: 22px; }
+  .log { right: calc(346px + env(safe-area-inset-right, 0px)); }
+}
 @media (min-width: 801px) { .legend { left: auto; right: calc(16px + env(safe-area-inset-right, 0px)); } }
 @media (max-width: 800px) {
   .topbar { left: calc(10px + env(safe-area-inset-left, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); top: calc(10px + env(safe-area-inset-top, 0px)); gap: 8px; }
