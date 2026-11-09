@@ -4421,11 +4421,23 @@ function setupRenderer() {
   controls.target.set(CENTER.x, 0.4, CENTER.z);
   controls.addEventListener('change', () => { dirty = true; });
   controls.addEventListener('start', () => { userMoved = true; });
+  // 滑鼠滾輪縮放：改成「平順、等比例」的自訂縮放。
+  // 原本每個滾輪事件都直接縮放，有些滑鼠／觸控板一格會送出好幾個事件，鏡頭就會一下衝到最近、一下退到最遠。
+  // 現在把每次滾動換算成固定比例（一格約 8%），而且一次最多只往前或往後追 1.5 倍距離，再用動畫慢慢靠過去。
+  renderer.domElement.addEventListener('wheel', (e) => {
+    e.preventDefault(); e.stopImmediatePropagation();
+    let dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1);
+    dy = clamp(dy, -100, 100);
+    const cur = camera.position.distanceTo(controls.target);
+    const from = wheelZoom != null ? wheelZoom : cur;
+    wheelZoom = clamp(from * Math.exp(dy * 0.0008), Math.max(controls.minDistance, cur / 1.5), Math.min(controls.maxDistance, cur * 1.5));
+    flight = null; userMoved = true; dirty = true;
+  }, { passive: false, capture: true });
 
   const ro = new ResizeObserver(() => onResize());
   ro.observe(stage);
 }
-let userMoved = false;
+let userMoved = false, wheelZoom = null;   // wheelZoom：滾輪縮放要平順靠近的目標距離
 function onResize() {
   const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
   if (!w || !h) return;
@@ -6346,7 +6358,7 @@ function buildLighthouseBeams() {
     g.fillStyle = gr; g.fillRect(0, 0, w, h);
   }, false);
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, color: '#fff1c4', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 }));
-  halo.scale.setScalar(0.7); halo.renderOrder = 4;
+  halo.scale.setScalar(0.4); halo.renderOrder = 4;
   group.add(halo);
   scene.add(group);
   // 一開始讓光束朝向大島嶼（地圖中心）
@@ -6361,7 +6373,7 @@ function lightLighthouse(night) {
   L.uni.uOpacity.value = k * 0.7;
   L.spots.forEach((sp) => (sp.intensity = k * 110));          // 只改亮度、不關燈，避免材質重新編譯
   L.halo.material.opacity = k * 0.85;
-  L.halo.scale.setScalar(0.62 + k * 0.08);                   // 光暈只比燈頭的燈光稍大一點
+  L.halo.scale.setScalar(0.4);                               // 光暈直徑 0.4：剛好包住燈頭
   const on = k > 0;
   L.beams.forEach((m) => (m.visible = on)); L.halo.visible = on;
 }
@@ -6931,6 +6943,7 @@ function overviewDistance() {
   return base * clamp(ext / 8.8, 0.62, 1);
 }
 function flyTo(pos, target, instant, dur = 800) {
+  wheelZoom = null;
   if (RM || instant) {
     flight = null; camera.position.copy(pos); controls.target.copy(target); controls.update(); dirty = true; return;
   }
@@ -7738,6 +7751,13 @@ function loop(now) {
     camera.position.lerpVectors(flight.p0, flight.p1, e);
     controls.target.lerpVectors(flight.t0, flight.t1, e);
     if (k >= 1) flight = null;
+    dirty = true;
+  }
+  if (wheelZoom != null) {
+    const off = camera.position.clone().sub(controls.target), d = off.length();
+    const nd = d + (wheelZoom - d) * (1 - Math.exp(-dt * 9));
+    camera.position.copy(controls.target).add(off.setLength(nd));
+    if (Math.abs(nd - wheelZoom) < 0.005) wheelZoom = null;
     dirty = true;
   }
   if (controls.update()) dirty = true;
