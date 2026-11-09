@@ -4346,6 +4346,7 @@ async function init() {
   await tick();
   renderNow();
   $('#loader').classList.add('done');
+  checkBrowserZoom();
   setTimeout(() => { const l = $('#loader'); if (l && l.classList.contains('done')) l.hidden = true; }, 700);
   // 「柴郡貓的怪問題」本題連結：網址最後是 #oddq=題目代號 時，直接打開那一題
   const oddqLink = (location.hash.match(/^#oddq=([\w-]+)/) || [])[1];
@@ -4354,6 +4355,29 @@ async function init() {
   requestAnimationFrame(loop);
 }
 
+/* ---------- 瀏覽器縮放提醒 ----------
+   Chrome 會「依檔案」記住縮放比例：同一個網頁換了檔名或位置，可能被縮成 67%、80%，整個版面就變小。
+   偵測到不是 100% 時，在畫面下方提醒按 Ctrl＋0 恢復原本大小（手機與觸控裝置不檢查）。 */
+function checkBrowserZoom() {
+  const show = () => {
+    if (isMobile || window.matchMedia('(pointer: coarse)').matches) return;
+    const zx = window.outerWidth / window.innerWidth, zy = (window.outerHeight - 90) / window.innerHeight;
+    const z = zx;   // 外框寬度 ÷ 網頁寬度 ≈ 縮放比例
+    let el = document.getElementById('zoomTip');
+    const off = !(z > 0.3 && Math.abs(zx - zy) < 0.25 && (z < 0.92 || z > 1.12));
+    if (off) { if (el) el.hidden = true; return; }
+    if (!el) {
+      el = document.createElement('div'); el.id = 'zoomTip'; el.setAttribute('role', 'status');
+      el.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:45;background:#fffbfd;color:#6b4c6e;border-radius:14px;padding:10px 14px;font:700 15px/1.5 sans-serif;box-shadow:0 0 0 2px #f27a9a,0 8px 24px rgba(43,29,63,.25);display:flex;gap:10px;align-items:center;max-width:calc(100vw - 32px)';
+      document.body.appendChild(el);
+    }
+    el.hidden = false;
+    el.innerHTML = `🔍 瀏覽器目前縮放約 ${Math.round(z * 100)}%，版面會${z < 1 ? '變小' : '變大'}。按 <kbd style="background:#f7f2ff;border-radius:6px;padding:1px 7px;box-shadow:inset 0 0 0 1px #d6c9f7">Ctrl</kbd>＋<kbd style="background:#f7f2ff;border-radius:6px;padding:1px 7px;box-shadow:inset 0 0 0 1px #d6c9f7">0</kbd>（Mac：⌘＋0）恢復原本大小。<button type="button" aria-label="關閉" style="border:0;background:#ffe8f0;color:#d95f82;border-radius:50%;width:32px;height:32px;font-weight:800;cursor:pointer;flex:none">✕</button>`;
+    el.querySelector('button').onclick = () => { el.hidden = true; window.__zoomTipClosed = true; };
+  };
+  show();
+  window.addEventListener('resize', () => { if (!window.__zoomTipClosed) show(); });
+}
 /* =====================================================================
    Renderer／相機／控制
    ===================================================================== */
@@ -6267,7 +6291,7 @@ function buildSeaProps() {
 
 /* ---------- 燈塔：360 度旋轉的放射光束 ----------
    兩道相反方向的光錐繞著燈頭旋轉，掃過海面並投射到中央的大島嶼上（每道光束各配一盞聚光燈，真的照亮島上的建築與樹）。
-   亮度跟著一天的時間變化：白天只剩淡淡的光，黃昏漸亮，夜裡最亮；燈頭的光暈在光束掃向鏡頭時會閃一下。 */
+   亮度跟著一天的時間變化：白天完全不亮，清晨與黃昏漸亮，夜裡最亮。 */
 const LH = { len: 17, radius: 2.5, tilt: 0.075, speed: (Math.PI * 2) / 9, beams: 2 };   // 長度、末端半徑、向下傾角、轉速（約 9 秒一圈）
 function buildLighthouseBeams() {
   if (!lighthouseAt) return;
@@ -6332,28 +6356,19 @@ function buildLighthouseBeams() {
 }
 function lightLighthouse(night) {
   const L = lighthouse; if (!L) return;
-  L.level = night;
-  L.uni.uOpacity.value = 0.08 + night * 0.62;                 // 白天淡淡的，夜裡最亮
-  L.spots.forEach((sp) => (sp.intensity = 1 + night * 110));
-  L.halo.material.opacity = 0.25 + night * 0.75;
+  // 亮度完全跟著時間：白天（night = 0）完全不亮，清晨／黃昏慢慢變亮，深夜最亮
+  const k = night < 0.02 ? 0 : night;
+  L.uni.uOpacity.value = k * 0.7;
+  L.spots.forEach((sp) => (sp.intensity = k * 110));          // 只改亮度、不關燈，避免材質重新編譯
+  L.halo.material.opacity = k * 0.9;
+  L.halo.scale.setScalar(1.2 + k * 0.6);
+  const on = k > 0;
+  L.beams.forEach((m) => (m.visible = on)); L.halo.visible = on;
 }
-let _lhDir = null;
 function updateLighthouse(dt) {
   const L = lighthouse; if (!L) return;
-  if (!_lhDir) _lhDir = new THREE.Vector3();
-  L.group.rotation.y += dt * LH.speed;
-  // 光束轉向鏡頭時，燈頭光暈閃一下
-  _lhDir.subVectors(camera.position, L.group.position).setY(0).normalize();
-  let face = 0;
-  for (let b = 0; b < LH.beams; b++) {
-    const an = L.group.rotation.y + (b / LH.beams) * Math.PI * 2;
-    face = Math.max(face, Math.cos(an) * _lhDir.x - Math.sin(an) * _lhDir.z);
-  }
-  const flash = Math.pow(Math.max(face, 0), 24);
-  L.halo.scale.setScalar(1.3 + flash * 2.2 + L.level * 0.5);
-  L.halo.material.opacity = Math.min(1, 0.25 + L.level * 0.75 + flash * 0.6);
+  L.group.rotation.y += dt * LH.speed;                          // 360 度持續旋轉（燈頭光暈不閃爍）
 }
-
 /* ---------- 背景樹（InstancedMesh，不投影） ---------- */
 function buildBackgroundTrees() {
   const rng = mulberry32(6060);
