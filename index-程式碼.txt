@@ -6346,7 +6346,7 @@ function buildLighthouseBeams() {
     g.fillStyle = gr; g.fillRect(0, 0, w, h);
   }, false);
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, color: '#fff1c4', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 }));
-  halo.scale.setScalar(1.4); halo.renderOrder = 4;
+  halo.scale.setScalar(0.7); halo.renderOrder = 4;
   group.add(halo);
   scene.add(group);
   // 一開始讓光束朝向大島嶼（地圖中心）
@@ -6360,8 +6360,8 @@ function lightLighthouse(night) {
   const k = night < 0.02 ? 0 : night;
   L.uni.uOpacity.value = k * 0.7;
   L.spots.forEach((sp) => (sp.intensity = k * 110));          // 只改亮度、不關燈，避免材質重新編譯
-  L.halo.material.opacity = k * 0.9;
-  L.halo.scale.setScalar(1.2 + k * 0.6);
+  L.halo.material.opacity = k * 0.85;
+  L.halo.scale.setScalar(0.62 + k * 0.08);                   // 光暈只比燈頭的燈光稍大一點
   const on = k > 0;
   L.beams.forEach((m) => (m.visible = on)); L.halo.visible = on;
 }
