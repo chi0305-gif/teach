@@ -4827,19 +4827,36 @@ window.HoushanSEL = (() => {
   probe.setAttribute('aria-hidden', 'true');
   probe.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:0;z-index:-1';
   document.body.appendChild(probe);
-  var root = document.documentElement, th = [];
+  var root = document.documentElement, th = [], ioVb = 0, ioVt = 0;
   for (var i = 0; i <= 100; i++) th.push(i / 100);
-  function apply(e) {
-    if (!e.isIntersecting) return;
-    var H = window.innerHeight, r = e.intersectionRect, cap = H * 0.4;
-    var vb = Math.min(cap, Math.max(0, H - r.bottom)), vt = Math.min(cap, Math.max(0, r.top));
+  var embedded = false;
+  try { embedded = window.self !== window.top; } catch (e) { embedded = true; }
+  var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  // 備援估算：iPad 的 Safari 在嵌入的網頁裡量不到外面的畫面，改用螢幕大小估計。
+  // 平板上，看得到的高度最多是「螢幕高度 − 瀏覽器分頁列與網址列 − 協作平台標題列」（約 180px）。
+  function estimate() {
+    if (!embedded || !touch || !window.screen) return 0;
+    var sw = screen.width, sh = screen.height, land = window.innerWidth > window.innerHeight;
+    var screenH = land ? Math.min(sw, sh) : Math.max(sw, sh);
+    return Math.max(0, window.innerHeight - (screenH - 180));
+  }
+  function write() {
+    var H = window.innerHeight, cap = H * 0.4;
+    var vb = Math.min(cap, Math.max(ioVb, estimate())), vt = Math.min(cap, ioVt);
     root.style.setProperty('--vb', (vb < 2 ? 0 : Math.round(vb)) + 'px');
     root.style.setProperty('--vt', (vt < 2 ? 0 : Math.round(vt)) + 'px');
   }
+  function apply(e) {
+    if (!e.isIntersecting) return;
+    var H = window.innerHeight, r = e.intersectionRect;
+    ioVb = Math.max(0, H - r.bottom); ioVt = Math.max(0, r.top);
+    write();
+  }
+  write();
   var io = new IntersectionObserver(function (list) { list.forEach(apply); }, { threshold: th });
   io.observe(probe);
   var t = 0;
-  function remeasure() { clearTimeout(t); t = setTimeout(function () { io.unobserve(probe); io.observe(probe); }, 150); }
+  function remeasure() { clearTimeout(t); t = setTimeout(function () { write(); io.unobserve(probe); io.observe(probe); }, 150); }
   window.addEventListener('resize', remeasure);
   window.addEventListener('orientationchange', remeasure);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', remeasure);
