@@ -1288,6 +1288,40 @@ body.hs-open { overflow: hidden; }
 @media (max-width: 420px) { .hs-who { grid-template-columns: .9fr 1.3fr .7fr; gap: 6px; } .hs-who input { padding: 0 8px; } }
 .hs-unit.done b, .hs-unit.done small { padding-right: 50px; }
 @media (prefers-reduced-motion: reduce) { .hs *, .hs-panel { animation: none !important; transition: none !important; } }
+/* ---------- 嵌入（例如 Google 協作平台「完整頁面嵌入」）時：避開被裁掉、看不到的區域 ----------
+   平板瀏覽器裡，嵌入的框底部常被網址列或工具列蓋住。程式會量出實際看得到的範圍，
+   寫進 --vb（底部被蓋住的高度）與 --vt（頂部被蓋住的高度），把底部工具列、按鈕與面板往上移。 */
+.hud, .hud-toggle, .legend { translate: 0 calc(-1 * var(--vb, 0px)); }
+.topbar, .tools { translate: 0 var(--vt, 0px); }
+@media (min-width: 801px) {
+  .card { bottom: calc(88px + var(--vb, 0px)); top: calc(98px + env(safe-area-inset-top, 0px) + var(--vt, 0px)); }
+  .side { max-height: calc(100% - 110px - var(--vb, 0px) - var(--vt, 0px)); translate: 0 var(--vt, 0px); }
+}
+@media (max-width: 800px) and (min-height: 501px) {
+  .card, .side { translate: 0 calc(-1 * var(--vb, 0px)); }
+}
+
+/* ---------- 平板直向（601–800px）：底部工具列整條顯示，不收進右下角的時鐘按鈕 ---------- */
+@media (min-width: 601px) and (max-width: 800px) and (min-height: 501px) {
+  .hud, .hud.open {
+    display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap;
+    left: 50%; right: auto; transform: translateX(-50%); width: auto; max-width: calc(100vw - 24px);
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)); border-radius: 999px; padding: 4px 8px; gap: 4px;
+  }
+  .hud .clock { padding: 0; border: 0; margin: 0; }
+  .hud #timeBtns, .hud .hud-group[aria-label] { display: flex; }
+  .hud .hud-group, .hud .hud-group:last-of-type { display: flex; flex-wrap: nowrap; max-width: none; gap: 0; }
+  .hud-sep { display: block; }
+  .hud .tbtn, .hud .tg { min-width: 44px; min-height: 52px; padding: 3px 4px; }
+  .hud .clock .seg { display: none; }
+  .hud .watch { width: 40px; height: 44px; }
+  .hud .clock .time { font-size: 22px; }
+  .hud .clock-text { min-width: 66px; }
+  .hud-toggle { display: none !important; }
+  /* 小平板的卡片與清單浮在左下，往上讓出底部工具列的位置 */
+  .card, .side { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+}
+
 </style>
 
 </head>
@@ -4782,6 +4816,33 @@ window.HoushanSEL = (() => {
     try { if (opener && opener.focus) opener.focus(); } catch (e) {}
   }
   return { open, close };
+})();
+</script>
+<script>
+/* 量出這個網頁「實際看得到」的範圍（嵌在 Google 協作平台等網站裡也量得到），
+   底部或頂部被裁掉、被瀏覽器工具列蓋住時，寫進 --vb / --vt，讓工具列自動往上移。 */
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  var probe = document.createElement('div');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:0;z-index:-1';
+  document.body.appendChild(probe);
+  var root = document.documentElement, th = [];
+  for (var i = 0; i <= 100; i++) th.push(i / 100);
+  function apply(e) {
+    if (!e.isIntersecting) return;
+    var H = window.innerHeight, r = e.intersectionRect, cap = H * 0.4;
+    var vb = Math.min(cap, Math.max(0, H - r.bottom)), vt = Math.min(cap, Math.max(0, r.top));
+    root.style.setProperty('--vb', (vb < 2 ? 0 : Math.round(vb)) + 'px');
+    root.style.setProperty('--vt', (vt < 2 ? 0 : Math.round(vt)) + 'px');
+  }
+  var io = new IntersectionObserver(function (list) { list.forEach(apply); }, { threshold: th });
+  io.observe(probe);
+  var t = 0;
+  function remeasure() { clearTimeout(t); t = setTimeout(function () { io.unobserve(probe); io.observe(probe); }, 150); }
+  window.addEventListener('resize', remeasure);
+  window.addEventListener('orientationchange', remeasure);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', remeasure);
 })();
 </script>
 <script type="importmap">
