@@ -876,6 +876,18 @@ body { font-size: 13px; }
 .wx-leaves .row span { display: inline-block; animation: wxLeaf .6s ease; }
 .wx-pad { display: block; margin-top: 10px; text-align: center; text-decoration: none; padding: 10px 12px; border-radius: 14px; background: linear-gradient(120deg, var(--lilac), var(--rose-pale)); color: var(--plum); font: 800 14px/1.4 var(--serif); box-shadow: var(--chip-shadow); }
 .wx-pad:hover { filter: brightness(1.04); }
+/* 柴郡貓的怪問題：把思辨卡貼到 Padlet */
+.cx-pad { margin-top: 12px; background: linear-gradient(120deg, var(--lilac-pale), var(--rose-pale)); border-radius: 16px; padding: 12px 14px; box-shadow: inset 0 0 0 1.5px var(--lilac); }
+.cx-pad > b { display: block; font: 800 15px/1.4 var(--serif); color: var(--plum); }
+.cx-pad ol { margin: 8px 0 10px; padding-left: 22px; font-size: 13.5px; line-height: 1.6; color: #3f3245; }
+.cx-pad li.ok { color: #2e7d4f; font-weight: 700; }
+.cx-pad li.ok::after { content: " ✔"; }
+.cx-pad-go { display: flex; justify-content: center; width: 100%; min-height: 46px; text-decoration: none; background: #fff; color: var(--plum); font-weight: 800; box-shadow: inset 0 0 0 2px var(--plum-2); }
+.cx-pad-go.ready { background: var(--rose); color: #fff; box-shadow: var(--chip-shadow); animation: cxPadPulse 1.6s ease-in-out 3; }
+.cx-pad-go.ready:hover { background: var(--rose-deep); color: #fff; }
+@keyframes cxPadPulse { 50% { transform: scale(1.03); } }
+.cx-pad-msg { margin: 8px 0 0; min-height: 1.4em; font-size: 13px; font-weight: 700; color: var(--plum); }
+@media (prefers-reduced-motion: reduce) { .cx-pad-go.ready { animation: none; } }
 .wx-pad small { display: block; font: 600 11.5px/1.4 var(--sans); color: var(--muted); }
 .cx-flipbox { background: var(--lilac-pale); border-radius: 14px; padding: 12px; margin-top: 10px; box-shadow: inset 0 0 0 1px var(--lilac); animation: pxRise .5s cubic-bezier(.3, 1.4, .5, 1); }
 .cx-flipbox[hidden] { display: none; }
@@ -3420,9 +3432,29 @@ window.OddQGame = (() => {
             <button class="btn cx-main" type="button" data-cx="dl">📥 下載思辨卡</button>
             <button class="btn" type="button" data-cx="cp">📋 複製文字</button>
             ${up ? `<button class="btn" type="button" data-cx="up">⬆️ 升級挑戰：${esc(up.ic + ' ' + up.name)}</button>` : ''}
+          </div>
+          <div class="cx-pad" data-cx="pad">
+            <b>🧷 把思辨卡貼到班級 Padlet</b>
+            <ol>
+              <li data-cx="pad1">按上面的「📥 下載思辨卡」，把卡片存成圖片</li>
+              <li data-cx="pad2">按下面的按鈕，打開柴郡貓的 Padlet</li>
+              <li>在 Padlet 按「＋」→ 上傳剛剛下載的思辨卡圖片（找不到圖片？直接貼上，已經幫你複製好文字了）</li>
+            </ol>
+            <a class="btn cx-pad-go" data-cx="padGo" href="${esc(window.ODDQ_PADLET)}" target="_blank" rel="noopener">🐾 打開 Padlet 張貼思辨卡 ↗</a>
+            <p class="cx-pad-msg" data-cx="padMsg" aria-live="polite"></p>
           </div>`;
-        fq('dl').onclick = () => downloadCard(card, n);
+        fq('dl').onclick = () => {
+          downloadCard(card, n);
+          fq('pad1').classList.add('ok'); fq('padGo').classList.add('ready');
+          fq('padMsg').textContent = '📥 思辨卡已下載！接著按「打開 Padlet 張貼思辨卡」。';
+        };
         fq('cp').onclick = () => copyCard(card, fq('cp'));
+        // 打開 Padlet 時，同時把思辨卡文字複製起來：不方便上傳圖片的學生，也能直接貼上
+        fq('padGo').onclick = () => {
+          copyCard(card, null);
+          fq('pad2').classList.add('ok');
+          fq('padMsg').textContent = '🧷 已打開 Padlet，也幫你複製了思辨卡文字。按「＋」上傳圖片或貼上文字就完成了！';
+        };
         if (up) fq('up').onclick = () => openCh(up.k);
         fq('cardOut').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         if (n % 5 === 0 || c.tier === 3) confetti();
@@ -3435,8 +3467,8 @@ window.OddQGame = (() => {
       const t = `【柴郡貓的思辨卡】\n關卡：${c.lv}\n學生：${stuLabel(c.stu)}\n課次：${c.type} ${c.lesson}\n問題：${c.q}\n`
         + c.sections.map((sc) => `${sc.label}：${sc.body}${sc.foot ? `（${sc.foot}）` : ''}`).join('\n')
         + `\n回到課文：${c.read}\n柴郡貓追問：${c.next}`;
-      const ok = () => { btn.textContent = '✅ 已複製'; };
-      const fb = () => { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); ok(); } catch (e) { btn.textContent = '複製失敗'; } a.remove(); };
+      const ok = () => { if (btn) btn.textContent = '✅ 已複製'; };
+      const fb = () => { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); ok(); } catch (e) { if (btn) btn.textContent = '複製失敗'; } a.remove(); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fb); else fb();
     }
     // 用 canvas 畫一張思辨卡（寬 1080，至少 1350 高；內容多時自動加長），讓學生存成圖片
@@ -3727,6 +3759,8 @@ window.LibraryGame = (() => {
    老師可以修改 WHISPER_PADLET（Padlet 網址）與 WHISPER（四種葉子的提示語）。
    ================================================================ */
 window.WHISPER_PADLET = 'https://padlet.com/tea752/padlet-s0254nrdano8iwsl70yl';
+/* 柴郡貓的怪問題：完成思辨卡後，學生張貼思辨卡的 Padlet（老師可以改成自己的網址） */
+window.ODDQ_PADLET = 'https://padlet.com/tea752/padlet-s0256yjcezh1gq1zvgol';
 const WHISPER = [
   { k: 'read', ic: '📖', name: '閱讀感想', sub: '讀完之後，心裡留下了什麼', tag: '📖 閱讀感想', hints: [
     '我讀了＿＿＿，最忘不了的一句是「＿＿＿」，因為……',
