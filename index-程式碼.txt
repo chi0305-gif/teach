@@ -730,6 +730,10 @@ body { font-size: 13px; }
 .px-fly { position: fixed; z-index: 9999; pointer-events: none; padding: 4px 10px; border-radius: 999px; background: var(--gold); color: var(--plum); font: 800 13px/1.4 var(--sans); transition: transform .55s cubic-bezier(.4, -0.3, .6, 1), opacity .55s; }
 .px-shelf { margin-bottom: 8px; }
 .px-shelf-h { display: flex; justify-content: space-between; align-items: center; font: 800 13px/1.3 var(--serif); color: var(--plum); margin-bottom: 5px; }
+.px-books { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 6px; }
+.px-books button { border: 0; border-radius: 999px; padding: 4px 9px; min-height: 30px; font: 700 11.5px/1 var(--sans); background: var(--lilac-pale); color: var(--plum); cursor: pointer; }
+.px-books button.sel { background: var(--plum-2); color: #fff; }
+.px-tip.t5 { background: #eef6ff; }
 .px-shelf-h button { border: 0; background: none; color: var(--rose-deep); font: 700 12px/1 var(--sans); cursor: pointer; padding: 4px; }
 .px-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .px-chip { border: 0; border-radius: 999px; padding: 6px 10px; font: 700 12.5px/1.2 var(--sans); background: #fff; color: #3f3245; cursor: pointer; box-shadow: var(--chip-shadow); transition: transform .12s; }
@@ -1756,30 +1760,58 @@ window.FortuneGame = (() => {
    在 DATA 的寶物裡加上 game: 'potion' 就會出現這個遊戲。
    三種材料（文人／場景／情境）各丟一樣進鍋，攪拌出一道文學寫作挑戰。
    老師可以直接在下面三個清單增刪材料：
-     POTION_AUTHORS：文人與他的代表作「祕方」
-       t 挑戰標題、form 文體、len 建議長度、lv 難度(1–3)、tip 寫作祕方、line 原作名句
+     POTION_AUTHORS：文人與他的代表作「祕方」（取自高中國文六冊選文表）
+       b 第幾冊、src 課本／閱讀文選、t 挑戰標題、form 文體、len 建議長度、lv 難度(1–3)、tip 寫作祕方、line 原作名句
      POTION_SCENES：現代場景與感官提示
      POTION_MOODS：情境與寫作提示
    ================================================================ */
+// b：第幾冊（1–6）；src：課本或閱讀文選。名單取自高中國文六冊選文表（課本＋閱讀文選）。
 const POTION_AUTHORS = [
-  { n: '李清照', t: '〈聲聲慢〉', form: '詞', len: '6–10 句', lv: 3, line: '尋尋覓覓，冷冷清清，淒淒慘慘戚戚。', tip: '開頭連用疊字堆出愁緒，再用眼前小物一層層加深，最後收在一句「怎一個愁字了得」式的總結。' },
-  { n: '李白', t: '〈月下獨酌〉', form: '古詩', len: '6–10 句', lv: 2, line: '舉杯邀明月，對影成三人。', tip: '明明只有一個人，卻把月亮、影子拉來作伴——用浪漫又誇張的想像，把孤單寫成熱鬧。' },
-  { n: '杜甫', t: '〈春望〉', form: '五言律詩', len: '8 句，每句 5 字', lv: 3, line: '感時花濺淚，恨別鳥驚心。', tip: '景物明明很美，卻因為心事而「花也流淚、鳥也驚心」；用景襯情，寫得真實又沉重。' },
-  { n: '蘇軾', t: '〈定風波〉', form: '詞', len: '6–10 句', lv: 2, line: '回首向來蕭瑟處，歸去，也無風雨也無晴。', tip: '遇到狼狽的事，卻選擇笑著走下去；最後一句來個豁達大翻轉。' },
-  { n: '陶淵明', t: '〈桃花源記〉', form: '記（散文）', len: '150–300 字', lv: 2, line: '緣溪行，忘路之遠近。忽逢桃花林。', tip: '意外闖進一個與世隔絕的美好地方，寫出裡面的人和規矩，最後「再也找不到入口」。' },
-  { n: '王維', t: '〈山居秋暝〉', form: '五言律詩', len: '8 句，每句 5 字', lv: 3, line: '明月松間照，清泉石上流。', tip: '詩中有畫：用光線、聲音、一動一靜，把場景拍成一張照片，情緒藏在畫面裡。' },
-  { n: '柳宗元', t: '〈江雪〉', form: '五言絕句', len: '4 句，每句 5 字', lv: 2, line: '千山鳥飛絕，萬徑人蹤滅。', tip: '先把畫面拉到最大、最空，再突然聚焦到一個孤單的小人物身上。' },
-  { n: '歸有光', t: '〈項脊軒志〉', form: '散文', len: '150–300 字', lv: 2, line: '庭有枇杷樹，吾妻死之年所手植也，今已亭亭如蓋矣。', tip: '用一個小空間串起人和回憶；結尾不說破，只交代一樣東西現在的樣子。' },
-  { n: '朱自清', t: '〈背影〉', form: '散文', len: '150–300 字', lv: 1, line: '我看見他戴著黑布小帽，穿著黑布大馬褂，深青布棉袍，蹣跚地走到鐵道邊。', tip: '不直接說「愛」，只把一個背影、一個動作，用慢動作放大寫。' },
-  { n: '白居易', t: '〈琵琶行〉', form: '樂府歌行', len: '8–12 句', lv: 3, line: '嘈嘈切切錯雜彈，大珠小珠落玉盤。', tip: '把耳朵聽到的聲音，用一連串比喻變成看得見的畫面。' },
-  { n: '孔子', t: '《論語》', form: '語錄', len: '1–3 則', lv: 1, line: '知之為知之，不知為不知，是知也。', tip: '用「子曰」開頭，短短幾句講一個道理；也可以寫成學生問、夫子答。' },
-  { n: '莊子', t: '〈逍遙遊〉', form: '寓言', len: '100–200 字', lv: 2, line: '北冥有魚，其名為鯤。鯤之大，不知其幾千里也。', tip: '用一個誇張又離奇的故事（超大的魚、會說話的動物）偷偷講一個道理。' },
-  { n: '余光中', t: '〈鄉愁〉', form: '新詩', len: '4 段', lv: 1, line: '小時候，鄉愁是一枚小小的郵票。', tip: '分成「小時候／長大後／後來啊／而現在」四段，每段用一個物件代表同一種思念。' },
-  { n: '辛棄疾', t: '〈醜奴兒・書博山道中壁〉', form: '詞', len: '6–8 句', lv: 2, line: '少年不識愁滋味，愛上層樓。', tip: '前後對比：以前「為賦新詞強說愁」，現在真的懂了，反而「欲說還休」。' },
-  { n: '劉禹錫', t: '〈陋室銘〉', form: '銘', len: '8–12 句', lv: 1, line: '山不在高，有仙則名；水不在深，有龍則靈。', tip: '套用「○不在○，有○則○」的句式，把一個平凡的地方寫得超有格調。' },
-  { n: '李商隱', t: '〈夜雨寄北〉', form: '七言絕句', len: '4 句，每句 7 字', lv: 3, line: '何當共剪西窗燭，卻話巴山夜雨時。', tip: '寫「現在」的同時，想像未來某一天，兩個人回頭聊起此刻。' },
-  { n: '張愛玲', t: '式金句', form: '金句散文', len: '1–3 句', lv: 2, line: '生命是一襲華美的袍，爬滿了蚤子。', tip: '一句冷冷的、精準又帶刺的比喻，把感情或人生一眼看透。' },
-  { n: '范仲淹', t: '〈岳陽樓記〉', form: '記（散文）', len: '150–300 字', lv: 3, line: '不以物喜，不以己悲。', tip: '同一個地方，寫出「悲」與「喜」兩種天氣、兩種心情，最後說出自己的志向。' }
+  /* ---------- 第一冊 ---------- */
+  { n: '劉義慶', b: 1, src: '課本', t: '《世說新語》', form: '筆記小說', len: '3–6 句', lv: 1, line: '吾本乘興而行，興盡而返，何必見戴？', tip: '用短短幾句寫一個人的「怪」舉動，最後讓他說一句名言，個性就跳出來了。' },
+  { n: '沈括', b: 1, src: '課本', t: '《夢溪筆談》', form: '筆記', len: '100–200 字', lv: 1, line: '方家以磁石磨針鋒，則能指南，然常微偏東，不全南也。', tip: '像科學家一樣觀察：寫下怎麼做、看到什麼、哪裡怪怪的，最後提出自己的發現。' },
+  { n: '鄭愁予', b: 1, src: '課本', t: '〈錯誤〉', form: '新詩', len: '2 段，8–10 行', lv: 1, line: '我達達的馬蹄是美麗的錯誤／我不是歸人，是個過客……', tip: '一個聲音讓人以為「等的人回來了」，結果只是路過——把期待和落空寫在同一個瞬間。' },
+  { n: '韓愈', b: 1, src: '課本', t: '〈師說〉', form: '論說文', len: '150–300 字', lv: 2, line: '師者，所以傳道、受業、解惑也。', tip: '開頭先下定義，再用「古人 vs. 今人」正反對比，最後說出你為什麼寫這篇。' },
+  { n: '陶淵明', b: 1, src: '課本', t: '〈桃花源記〉', form: '記（散文）', len: '150–300 字', lv: 2, line: '緣溪行，忘路之遠近。忽逢桃花林。', tip: '意外闖進一個與世隔絕的美好地方，寫出裡面的人和規矩，最後「再也找不到入口」。' },
+  { n: '孔子', b: 1, src: '閱讀文選', t: '《論語》', form: '語錄', len: '1–3 則', lv: 1, line: '老者安之，朋友信之，少者懷之。', tip: '寫成「師生聊天」：學生各說志向，最後老師說出自己的，短短幾句就有畫面。' },
+  { n: '歸有光', b: 1, src: '閱讀文選', t: '〈項脊軒志〉', form: '散文', len: '150–300 字', lv: 2, line: '庭有枇杷樹，吾妻死之年所手植也，今已亭亭如蓋矣。', tip: '用一個小空間串起人和回憶；結尾不說破，只交代一樣東西現在的樣子。' },
+  { n: '白居易', b: 1, src: '閱讀文選', t: '〈琵琶行〉', form: '樂府歌行', len: '8–12 句', lv: 3, line: '嘈嘈切切錯雜彈，大珠小珠落玉盤。', tip: '把耳朵聽到的聲音，用一連串比喻變成看得見的畫面。' },
+  /* ---------- 第二冊 ---------- */
+  { n: '袁宏道', b: 2, src: '課本', t: '〈晚遊六橋待月記〉', form: '小品文', len: '100–200 字', lv: 2, line: '西湖最盛，為春為月。', tip: '大家都去的熱門景點，你卻說：最美的時刻，是別人都沒看到的那一刻。' },
+  { n: '柳宗元', b: 2, src: '課本', t: '〈種樹郭橐駝傳〉', form: '傳（寓言式）', len: '150–250 字', lv: 2, line: '能順木之天，以致其性焉爾。', tip: '借一個「達人」的獨門祕訣（種樹、養貓、帶球隊……），偷偷講出怎麼對待人的道理。' },
+  { n: '李白', b: 2, src: '課本', t: '〈把酒問月〉', form: '古詩', len: '6–10 句', lv: 2, line: '今人不見古時月，今月曾經照古人。', tip: '對著月亮一連問好幾個問題，把古人和現在的你，放在同一輪月光下。' },
+  { n: '魯迅', b: 2, src: '課本', t: '〈孔乙己〉', form: '小說', len: '200–300 字', lv: 2, line: '孔乙己是站著喝酒而穿長衫的唯一的人。', tip: '從一個旁觀者的眼睛，寫一個常被大家取笑的人；笑聲背後，藏著一點悲涼。' },
+  { n: '張岱', b: 2, src: '閱讀文選', t: '〈西湖七月半〉', form: '小品文', len: '100–200 字', lv: 2, line: '西湖七月半，一無可看，止可看看七月半之人。', tip: '不看風景看人：把來湊熱鬧的人分成幾類，一類一類毒舌觀察。' },
+  { n: '吳敬梓', b: 2, src: '閱讀文選', t: '〈范進中舉〉', form: '小說', len: '150–300 字', lv: 1, line: '噫！好了！我中了！', tip: '把收到好消息時的瘋狂反應寫得超誇張，再寫身邊的人態度一百八十度大轉變。' },
+  /* ---------- 第三冊 ---------- */
+  { n: '左丘明', b: 3, src: '課本', t: '〈燭之武退秦師〉', form: '史傳', len: '150–300 字', lv: 2, line: '若亡鄭而有益於君，敢以煩執事。', tip: '一個人單槍匹馬，不吵不鬧，用「替對方著想」的一番話，說服對手退兵。' },
+  { n: '范仲淹', b: 3, src: '課本', t: '〈岳陽樓記〉', form: '記（散文）', len: '150–300 字', lv: 3, line: '先天下之憂而憂，後天下之樂而樂。', tip: '同一個地方，寫出「悲」與「喜」兩種天氣、兩種心情，最後說出自己的志向。' },
+  { n: '紀弦', b: 3, src: '課本', t: '〈狼之獨步〉', form: '新詩', len: '6–10 行', lv: 1, line: '我乃曠野裡獨來獨往的一匹狼。', tip: '用一種動物代表自己，寫出不被理解、卻很驕傲的孤獨。' },
+  { n: '王昌齡', b: 3, src: '課本', t: '〈出塞〉', form: '七言絕句', len: '4 句，每句 7 字', lv: 3, line: '秦時明月漢時關，萬里長征人未還。', tip: '把千年的時間和萬里的距離放進一句話，再收在一個心願上。' },
+  { n: '杜甫', b: 3, src: '課本', t: '〈旅夜書懷〉', form: '五言律詩', len: '8 句，每句 5 字', lv: 3, line: '飄飄何所似？天地一沙鷗。', tip: '先寫眼前遼闊的夜景，最後把自己比成一個小小的東西，孤單就出來了。' },
+  { n: '李商隱', b: 3, src: '課本', t: '〈無題〉', form: '七言律詩', len: '8 句，每句 7 字', lv: 3, line: '相見時難別亦難，東風無力百花殘。', tip: '不說「我想你」，用春天凋謝的花、燒到最後的蠟燭，寫出捨不得。' },
+  { n: '諸葛亮', b: 3, src: '課本', t: '〈出師表〉', form: '表（奏章）', len: '150–300 字', lv: 2, line: '臣本布衣，躬耕於南陽，苟全性命於亂世。', tip: '寫一封給重要的人的叮嚀信：一邊回憶過去，一邊交代未來，句句真心。' },
+  { n: '曹雪芹', b: 3, src: '閱讀文選', t: '〈劉姥姥進大觀園〉', form: '章回小說', len: '200–300 字', lv: 1, line: '老劉，老劉，食量大似牛，吃一個老母豬不抬頭！', tip: '讓一個「很不搭」的人闖進高級場合，用他的笑點，寫出全場每個人笑翻的樣子。' },
+  { n: '歐陽脩', b: 3, src: '閱讀文選', t: '〈醉翁亭記〉', form: '記（散文）', len: '150–250 字', lv: 2, line: '醉翁之意不在酒，在乎山水之間也。', tip: '每句都用「也」字收尾，寫大家在一個地方有多快樂，最後揭曉快樂的真正原因。' },
+  { n: '羅貫中', b: 3, src: '閱讀文選', t: '〈用奇謀孔明借箭〉', form: '章回小說', len: '200–300 字', lv: 2, line: '亮於三日前已算定今日有大霧，因此敢任三日之限。', tip: '大家都以為這個任務不可能，主角卻早就算好一切——把「反轉」留到最後。' },
+  /* ---------- 第四冊 ---------- */
+  { n: '詩經作者', b: 4, src: '課本', t: '〈蒹葭〉', form: '詩經（重章疊句）', len: '3 段，每段 4–8 句', lv: 1, line: '蒹葭蒼蒼，白露為霜。所謂伊人，在水一方。', tip: '寫三段幾乎一樣的話，每段只換幾個字，寫一個看得到、卻追不到的人或夢想。' },
+  { n: '蒲松齡', b: 4, src: '課本', t: '〈勞山道士〉', form: '志怪小說', len: '200–300 字', lv: 1, line: '歸宜潔持，否則不驗。', tip: '一個想走捷徑的人學了一點「法術」，回家馬上炫耀，結果當場出糗。' },
+  { n: '蘇軾', b: 4, src: '課本', t: '〈赤壁賦〉', form: '賦', len: '150–300 字', lv: 3, line: '寄蜉蝣於天地，渺滄海之一粟。', tip: '寫成主客對話：一個人很悲觀，另一個人用豁達的想法，把煩惱一層層化開。' },
+  { n: '李煜', b: 4, src: '課本', t: '〈浪淘沙〉', form: '詞', len: '6–10 句', lv: 3, line: '流水落花春去也，天上人間。', tip: '夢裡還是從前的好日子，醒來才發現一切都回不去了。' },
+  { n: '李清照', b: 4, src: '課本', t: '〈一剪梅〉', form: '詞', len: '6–10 句', lv: 3, line: '此情無計可消除，才下眉頭，卻上心頭。', tip: '用一個小動作（皺眉、嘆氣）寫想念：好不容易放下，下一秒又湧上心頭。' },
+  { n: '辛棄疾', b: 4, src: '課本', t: '〈破陣子〉', form: '詞', len: '6–10 句', lv: 2, line: '醉裡挑燈看劍，夢回吹角連營。', tip: '先寫熱血沸騰的夢想場面，最後一句突然跌回現實。' },
+  { n: '王羲之', b: 4, src: '課本', t: '〈蘭亭集序〉', form: '序', len: '150–300 字', lv: 2, line: '後之視今，亦猶今之視昔。', tip: '寫一場和朋友的快樂聚會，寫著寫著，感嘆起時間會過去。' },
+  { n: '荀子', b: 4, src: '閱讀文選', t: '〈勸學〉', form: '論說文', len: '100–200 字', lv: 1, line: '青，取之於藍，而青於藍。', tip: '用一連串生活中的比喻，說服別人「持續學習」有多重要。' },
+  /* ---------- 第五冊 ---------- */
+  { n: '屈原', b: 5, src: '課本', t: '〈漁父〉', form: '楚辭（對話）', len: '150–250 字', lv: 2, line: '舉世皆濁我獨清，眾人皆醉我獨醒。', tip: '寫一場對話：一個堅持原則的人，遇上一個勸他「隨和一點」的人。' },
+  { n: '洛夫', b: 5, src: '課本', t: '〈愛的辯證〉', form: '新詩', len: '2 段，各 6–10 行', lv: 2, line: '水來，我在水中等你；火來，我在灰燼中等你。', tip: '同一個約定寫兩種版本：一個堅持等到底，一個選擇轉身離開。' },
+  { n: '莊子', b: 5, src: '課本', t: '〈庖丁解牛〉', form: '寓言', len: '150–250 字', lv: 2, line: '以無厚入有閒，恢恢乎其於遊刃必有餘地矣。', tip: '寫一個把某件事練到出神入化的高手，讓他說出看似簡單、其實很深的祕訣。' },
+  { n: '龍應台', b: 5, src: '課本', t: '〈給河馬刷牙〉', form: '雜文', len: '150–300 字', lv: 2, line: '（〈給河馬刷牙〉、〈大山大河大海〉作者）', tip: '用一個荒謬好笑的小事開頭，慢慢帶到你真正想討論的社會問題。' },
+  /* ---------- 第六冊 ---------- */
+  { n: '司馬遷', b: 6, src: '課本', t: '〈鴻門宴〉', form: '史傳', len: '200–300 字', lv: 2, line: '如今人方為刀俎，我為魚肉，何辭為？', tip: '一場表面吃飯、其實暗藏危機的聚會，用對話和小動作寫出緊張感。' },
+  { n: '喬治・歐威爾', b: 6, src: '課本', t: '〈動物農莊與七誡〉', form: '寓言小說', len: '150–300 字', lv: 2, line: '所有動物一律平等，但有些動物比其他動物更平等。', tip: '讓一群動物當主角，寫規則被偷偷改掉的荒謬，好笑又讓人發冷。' },
+  { n: '顧玉玲', b: 6, src: '課本', t: '〈俊興街二二四巷〉', form: '報導文學', len: '150–300 字', lv: 1, line: '所有的夢想都排列在償清負債的後面。', tip: '用真實的細節（薪水單、宿舍、週末的照片）寫一個人的處境，不喊口號，讓讀者自己感受。' }
 ];
 const POTION_SCENES = [
   { n: '便利商店', s: '叮咚的自動門、微波爐「嗶」一聲、關東煮的熱氣、凌晨的日光燈' },
@@ -1835,14 +1867,16 @@ const POTION_SPICES = [
 ];
 // 傳說組合：剛好丟進這兩樣，會出現特別的傳說藥水
 const POTION_LEGENDS = [
-  { a: '李清照', b: '失戀', say: '原汁原味藥水！李清照表示：這題我熟。' },
-  { a: '蘇軾', b: '颱風夜的家', say: '莫聽穿林打葉聲——這次是真的颱風。' },
+  { a: '李清照', b: '失戀', say: '此情無計可消除——李清照表示：這題我熟。' },
+  { a: '蘇軾', b: '颱風夜的家', say: '寄蜉蝣於天地——颱風夜裡，蘇軾邀你一起看開。' },
   { a: '陶淵明', b: '迷路', say: '誤入桃花源的正確打開方式。' },
-  { a: '余光中', b: '想家', say: '鄉愁濃度 200%，請準備衛生紙。' },
-  { a: '李商隱', b: '被已讀不回', say: '君問歸期未有期，已讀不回也是期。' },
-  { a: '朱自清', b: '便利商店', say: '「我買幾個茶葉蛋去。你就在此地，不要走動。」' },
+  { a: '鄭愁予', b: '等外送', say: '我達達的機車聲是美麗的錯誤——不是你的外送。' },
+  { a: '李商隱', b: '被已讀不回', say: '相見時難，已讀不回更難。' },
+  { a: '吳敬梓', b: '中了發票', say: '噫！好了！我中了！——范進本人親自示範。' },
   { a: '李白', b: '演唱會搖滾區', say: '古代頂流本人駕到，請寫出他的應援口號。' },
-  { a: '柳宗元', b: '段考考場', say: '千山鳥飛絕，萬徑人蹤滅——全班只剩你還在寫。' }
+  { a: '屈原', b: '段考考場', say: '眾人皆醉我獨醒——全班都睡了，只有你還在寫。' },
+  { a: '喬治・歐威爾', b: 'LINE 群組', say: '所有成員一律平等，但群組管理員比較平等。' },
+  { a: '曹雪芹', b: '夜市', say: '劉姥姥逛夜市：食量大似牛，吃一攤又一攤。' }
 ];
 window.PotionGame = (() => {
   const SHOW = 6;
@@ -1886,6 +1920,7 @@ window.PotionGame = (() => {
       ${SHELVES.map((sh) => `
         <div class="px-shelf">
           <div class="px-shelf-h"><span>${sh.icon} ${sh.label}</span><button type="button" data-shuffle="${sh.k}">🔄 換一批</button></div>
+          ${sh.k === 'a' ? `<div class="px-books" role="group" aria-label="依冊次挑文人">${['全部', '第一冊', '第二冊', '第三冊', '第四冊', '第五冊', '第六冊'].map((t, i) => `<button type="button" data-book="${i}" class="${i === 0 ? 'sel' : ''}" aria-pressed="${i === 0}">${t}</button>`).join('')}</div>` : ''}
           <div class="px-chips" data-chips="${sh.k}"></div>
         </div>`).join('')}
       <label class="px-spice"><input type="checkbox" data-px="spice"> 🌶️ 加一匙瘋帽子調味料（隨機寫作限制，更難！）</label>
@@ -1908,13 +1943,24 @@ window.PotionGame = (() => {
     const pot = q('pot'), msg = q('msg'), task = q('task');
     const pick = { a: null, s: null, m: null };
     const shown = {};
+    let book = 0;   // 0 = 全部冊次；1–6 = 只挑那一冊課本裡的文人
+    const listOf = (k) => { const sh = SHELVES.find((x) => x.k === k); return k === 'a' && book ? sh.list.filter((it) => it.b === book) : sh.list; };
+    root.querySelectorAll('[data-book]').forEach((bt) => {
+      bt.onclick = () => {
+        book = Number(bt.dataset.book);
+        root.querySelectorAll('[data-book]').forEach((x) => { const on = x === bt; x.classList.toggle('sel', on); x.setAttribute('aria-pressed', String(on)); });
+        if (pick.a && book && pick.a.b !== book) pick.a = null;
+        shown.a = null; renderShelf('a'); renderSlots();
+        msg.textContent = book ? `📚 現在只放第${'一二三四五六'[book - 1]}冊課本裡的文人。` : '📚 六冊課本的文人都在架上了。';
+      };
+    });
     let current = null, busy = false;
     const works = () => memWorks || store.get('works', []);
     const saveWorks = (w) => { memWorks = w; store.set('works', w); };
 
     function renderShelf(k) {
       const sh = SHELVES.find((x) => x.k === k);
-      if (!shown[k]) shown[k] = shuffle(sh.list).slice(0, SHOW);
+      if (!shown[k]) shown[k] = shuffle(listOf(k)).slice(0, k === 'a' && book ? 99 : SHOW);
       if (pick[k] && !shown[k].includes(pick[k])) shown[k][0] = pick[k];
       const box = root.querySelector(`[data-chips="${k}"]`);
       box.innerHTML = '';
@@ -1955,7 +2001,7 @@ window.PotionGame = (() => {
     }
     function randomAll() {
       if (busy) return;
-      SHELVES.forEach((sh) => { pick[sh.k] = sh.list[Math.floor(Math.random() * sh.list.length)]; shown[sh.k] = null; renderShelf(sh.k); });
+      SHELVES.forEach((sh) => { const L = listOf(sh.k); pick[sh.k] = L[Math.floor(Math.random() * L.length)]; shown[sh.k] = null; renderShelf(sh.k); });
       pot.style.setProperty('--brew', BREWS[Math.floor(Math.random() * BREWS.length)]);
       renderSlots();
       msg.textContent = '瘋帽子：「為什麼烏鴉像書桌？」——一邊說一邊亂丟了三樣東西。';
@@ -1981,7 +2027,8 @@ window.PotionGame = (() => {
           <h3>${esc(a.n)}＋${esc(s.n)}＋${esc(m.n)}</h3>
           <p class="px-mission">請化身 <b>${esc(a.n)}</b>，在 <b>${esc(s.n)}</b> 裡，寫下 <b>${esc(m.n)}</b> 的心情——完成一篇 <b>${esc(title)}</b>。</p>
           ${legend ? `<div class="px-tip t4">🌈 <b>傳說組合：</b>${esc(legend.say)}</div>` : ''}
-          <div class="px-tip t1">📜 <b>原作祕方（${esc(a.form)}，建議 ${esc(a.len)}）：</b>${esc(a.tip)}<br>原句參考：「${esc(a.line)}」</div>
+          ${a.b ? `<div class="px-tip t5">📚 <b>課本出處：</b>第${'一二三四五六'[a.b - 1]}冊${esc(a.src || '')}　${esc(a.n)}${esc(a.t)}</div>` : ''}
+          <div class="px-tip t1">📜 <b>原作祕方（${esc(a.form)}，建議 ${esc(a.len)}）：</b>${esc(a.tip)}${a.line.startsWith('（') ? '' : `<br>原句參考：「${esc(a.line)}」`}</div>
           <div class="px-tip t2">👀 <b>場景素材：</b>${esc(s.s)}</div>
           <div class="px-tip t3">💡 <b>情境提示：</b>${esc(m.h)}</div>
           ${spice ? `<div class="px-tip t4">🌶️ <b>瘋帽子調味料：</b>${esc(spice)}</div>` : ''}
