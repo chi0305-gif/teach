@@ -5071,13 +5071,16 @@ window.HoushanSEL = (() => {
   var embedded = false;
   try { embedded = window.self !== window.top; } catch (e) { embedded = true; }
   var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-  // 備援估算：iPad 的 Safari 在嵌入的網頁裡量不到外面的畫面，改用螢幕大小估計。
-  // 平板上，看得到的高度最多是「螢幕高度 − 瀏覽器分頁列與網址列 − 協作平台標題列」（約 180px）。
+  // 備援估算：有些平板瀏覽器（例如上方有分頁列＋網址列的瀏覽器）會把網頁高度算得比畫面上看得到的還高，
+  // 也不會告訴網頁被擋住多少，所以改用螢幕大小估計：
+  // 看得到的高度最多是「螢幕高度 − 瀏覽器上方的分頁列與網址列（約 150px）」，嵌在網站裡再扣網站標題列（共約 200px）。
+  // 網頁高度超出這個上限的部分，一定在螢幕外，就把功能列往上移那麼多。
   function estimate() {
-    if (!embedded || !touch || !window.screen) return 0;
+    if (!touch || !window.screen) return 0;
     var sw = screen.width, sh = screen.height, land = window.innerWidth > window.innerHeight;
     var screenH = land ? Math.min(sw, sh) : Math.max(sw, sh);
-    return Math.max(0, window.innerHeight - (screenH - 180));
+    var cut = Math.max(0, window.innerHeight - (screenH - (embedded ? 200 : 150)));
+    return cut < 12 ? 0 : cut;
   }
   // 直接用瀏覽器開啟時（不是嵌入），iPad 的 Safari 有時「實際看得到的範圍」比網頁本身矮，
   // 這時用 visualViewport（可視範圍）量出底部被蓋住多少。
@@ -5098,6 +5101,21 @@ window.HoushanSEL = (() => {
     write();
   }
   write();
+  // 除錯用：網址最後加上 ?debug=1，畫面左下角會顯示各種尺寸，方便找出功能列被擋住的原因
+  if (/[?&]debug=1/.test(location.search)) {
+    var dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;left:8px;top:45%;z-index:99;background:rgba(43,29,63,.85);color:#fff;font:12px/1.5 monospace;padding:6px 8px;border-radius:8px;pointer-events:none;white-space:pre';
+    document.body.appendChild(dbg);
+    var show = function () {
+      var vv = window.visualViewport || {};
+      dbg.textContent = 'inner ' + innerWidth + '×' + innerHeight + '\nscreen ' + screen.width + '×' + screen.height +
+        '\nvv ' + Math.round(vv.width || 0) + '×' + Math.round(vv.height || 0) + ' top ' + Math.round(vv.offsetTop || 0) +
+        '\nclient ' + document.documentElement.clientHeight + '\nembedded ' + embedded + ' touch ' + touch +
+        '\nio ' + Math.round(ioVb) + ' est ' + Math.round(estimate()) + ' vv-cut ' + Math.round(viewportCut()) +
+        '\n--vb ' + root.style.getPropertyValue('--vb');
+    };
+    show(); setInterval(show, 1000);
+  }
   var io = new IntersectionObserver(function (list) { list.forEach(apply); }, { threshold: th });
   io.observe(probe);
   var t = 0;
