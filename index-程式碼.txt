@@ -1304,13 +1304,6 @@ body.hs-open { overflow: hidden; }
 @media (max-width: 420px) { .hs-who { grid-template-columns: .9fr 1.3fr .7fr; gap: 6px; } .hs-who input { padding: 0 8px; } }
 .hs-unit.done b, .hs-unit.done small { padding-right: 50px; }
 @media (prefers-reduced-motion: reduce) { .hs *, .hs-panel { animation: none !important; transition: none !important; } }
-/* ---------- 觸控裝置的保險：「時間」按鈕把功能列移到畫面上方 ---------- */
-.hud-top-btn { display: none; }
-@media (pointer: coarse) { .hud-top-btn { display: inline-flex; } }
-.hud-top-btn[aria-pressed="true"] { background: var(--rose); color: #fff; }
-body.hud-top .hud { position: fixed; transform: none !important; translate: none !important; display: flex; z-index: 16; max-width: calc(100vw - 24px); }
-body.hud-top .hud-toggle { display: none !important; }
-@media (max-width: 600px) { body.hud-top .hud { display: grid; } }
 
 /* ---------- 嵌入（例如 Google 協作平台「完整頁面嵌入」）時：避開被裁掉、看不到的區域 ----------
    平板瀏覽器裡，嵌入的框底部常被網址列或工具列蓋住。程式會量出實際看得到的範圍，
@@ -1404,9 +1397,6 @@ body.hud-top .hud-toggle { display: none !important; }
   </button>
   <button class="btn" id="btnHelp" title="操作說明" data-en-label="How to use">
     <svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 7 0 0 1 17 0z"/><path d="M9.5 12v6a2.5 2.5 0 0 0 5 0v-6"/><circle cx="8.5" cy="8.6" r=".9"/><circle cx="15.3" cy="9" r=".9"/><circle cx="12" cy="6.6" r=".9"/></svg><span data-en="Help">說明</span>
-  </button>
-  <button class="btn hud-top-btn" id="btnHudTop" aria-pressed="false" aria-controls="hud" title="時間與顯示工具" data-en-label="Time and display tools">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.2l2.8 1.8M9.5 3.5h5M12 3.5v2"/></svg><span data-en="Tools">時間</span>
   </button>
 </nav>
 </div>
@@ -5128,28 +5118,20 @@ window.HoushanSEL = (() => {
   // 有些平板瀏覽器在網頁載入後才「悄悄」把畫面高度定下來，卻不通知網頁，
   // 導致功能列一開始被擋住、要等某個操作才跑出來。所以除了等通知，也定期（每 0.7 秒）和每次觸碰後重新量一次。
   setInterval(write, 700);
-  ['pageshow', 'load', 'focus', 'touchend', 'pointerup'].forEach(function (ev) { window.addEventListener(ev, function () { write(); setTimeout(write, 350); }, { passive: true }); });
+  // 剛進畫面、轉向、改變大小時，連續幾秒「每一個畫面」都重新量，功能列在你注意到之前就已經放好
+  var burstUntil = 0;
+  function burst(ms) {
+    var start = !burstUntil || Date.now() > burstUntil;
+    burstUntil = Math.max(burstUntil, Date.now() + ms);
+    if (!start) return;
+    (function tick() { write(); if (Date.now() < burstUntil) requestAnimationFrame(tick); else burstUntil = 0; })();
+  }
+  burst(5000);
+  ['pageshow', 'load', 'resize', 'orientationchange'].forEach(function (ev) { window.addEventListener(ev, function () { burst(2500); }); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', function () { burst(1500); });
+  ['focus', 'touchend', 'pointerup'].forEach(function (ev) { window.addEventListener(ev, function () { write(); setTimeout(write, 350); }, { passive: true }); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) write(); });
 
-  // 保險：觸控裝置的上方工具列多一個「時間」按鈕，按下後把整條功能列移到畫面上方（上方一定看得到）
-  var btn = document.getElementById('btnHudTop'), hud = document.getElementById('hud'), tools = document.getElementById('tools');
-  if (!btn || !hud || !tools) return;
-  function placeTop() {
-    var r = tools.getBoundingClientRect(), narrow = window.innerWidth <= 800;
-    hud.style.top = Math.round(r.bottom + 10) + 'px';
-    hud.style.bottom = 'auto';
-    hud.style.left = narrow ? '12px' : Math.round(Math.max(12, r.left)) + 'px';
-    hud.style.right = 'auto';
-  }
-  function setTop(on) {
-    document.body.classList.toggle('hud-top', on);
-    btn.setAttribute('aria-pressed', String(on));
-    hud.classList.toggle('open', on);
-    var tg = document.getElementById('hudToggle'); if (tg) tg.setAttribute('aria-expanded', String(on));
-    if (on) placeTop(); else ['top', 'bottom', 'left', 'right'].forEach(function (k) { hud.style[k] = ''; });
-  }
-  btn.addEventListener('click', function () { setTop(!document.body.classList.contains('hud-top')); });
-  window.addEventListener('resize', function () { if (document.body.classList.contains('hud-top')) setTimeout(placeTop, 200); });
 })();
 </script>
 <script type="importmap">
