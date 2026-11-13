@@ -5088,11 +5088,13 @@ window.HoushanSEL = (() => {
     var vv = window.visualViewport; if (!vv) return 0;
     return Math.max(0, window.innerHeight - (vv.offsetTop + vv.height));
   }
+  var lastVb = '', lastVt = '';
   function write() {
     var H = window.innerHeight, cap = H * 0.4;
     var vb = Math.min(cap, Math.max(ioVb, estimate(), viewportCut())), vt = Math.min(cap, ioVt);
-    root.style.setProperty('--vb', (vb < 2 ? 0 : Math.round(vb)) + 'px');
-    root.style.setProperty('--vt', (vt < 2 ? 0 : Math.round(vt)) + 'px');
+    var b = (vb < 2 ? 0 : Math.round(vb)) + 'px', t = (vt < 2 ? 0 : Math.round(vt)) + 'px';
+    if (b !== lastVb) { root.style.setProperty('--vb', b); lastVb = b; }   // 數值有變才更新，平常不會造成負擔
+    if (t !== lastVt) { root.style.setProperty('--vt', t); lastVt = t; }
   }
   function apply(e) {
     if (!e.isIntersecting) return;
@@ -5123,6 +5125,11 @@ window.HoushanSEL = (() => {
   window.addEventListener('resize', remeasure);
   window.addEventListener('orientationchange', remeasure);
   if (window.visualViewport) { window.visualViewport.addEventListener('resize', remeasure); window.visualViewport.addEventListener('scroll', write); }
+  // 有些平板瀏覽器在網頁載入後才「悄悄」把畫面高度定下來，卻不通知網頁，
+  // 導致功能列一開始被擋住、要等某個操作才跑出來。所以除了等通知，也定期（每 0.7 秒）和每次觸碰後重新量一次。
+  setInterval(write, 700);
+  ['pageshow', 'load', 'focus', 'touchend', 'pointerup'].forEach(function (ev) { window.addEventListener(ev, function () { write(); setTimeout(write, 350); }, { passive: true }); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) write(); });
 
   // 保險：觸控裝置的上方工具列多一個「時間」按鈕，按下後把整條功能列移到畫面上方（上方一定看得到）
   var btn = document.getElementById('btnHudTop'), hud = document.getElementById('hud'), tools = document.getElementById('tools');
