@@ -5078,10 +5078,17 @@ window.HoushanSEL = (() => {
     var vv = window.visualViewport; if (!vv) return 0;
     return Math.max(0, window.innerHeight - (vv.offsetTop + vv.height));
   }
+  // 有些平板瀏覽器回報的高度正確，但「固定在畫面上的元件」（功能列、卡片）卻以一塊更高、延伸到螢幕下方的範圍來定位。
+  // 直接量這塊範圍（probe 的高度）和真正看得到的高度相差多少，就是被擋住的部分。
+  function fixedCut() {
+    var ph = probe.getBoundingClientRect().height, vv = window.visualViewport;
+    var visible = Math.min(window.innerHeight, vv ? vv.offsetTop + vv.height : window.innerHeight);
+    return Math.max(0, ph - visible);
+  }
   var lastVb = '', lastVt = '';
   function write() {
     var H = window.innerHeight, cap = H * 0.4;
-    var vb = Math.min(cap, Math.max(ioVb, estimate(), viewportCut())), vt = Math.min(cap, ioVt);
+    var vb = Math.min(cap, Math.max(ioVb, estimate(), viewportCut(), fixedCut())), vt = Math.min(cap, ioVt);
     var b = (vb < 2 ? 0 : Math.round(vb)) + 'px', t = (vt < 2 ? 0 : Math.round(vt)) + 'px';
     if (b !== lastVb) { root.style.setProperty('--vb', b); lastVb = b; }   // 數值有變才更新，平常不會造成負擔
     if (t !== lastVt) { root.style.setProperty('--vt', t); lastVt = t; }
@@ -5098,11 +5105,15 @@ window.HoushanSEL = (() => {
     var dbg = document.createElement('div');
     dbg.style.cssText = 'position:fixed;left:8px;top:45%;z-index:99;background:rgba(43,29,63,.85);color:#fff;font:12px/1.5 monospace;padding:6px 8px;border-radius:8px;pointer-events:none;white-space:pre';
     document.body.appendChild(dbg);
+    var mk = function (h) { var e = document.createElement('div'); e.style.cssText = 'position:absolute;left:-9px;top:0;width:1px;height:' + h + ';pointer-events:none;visibility:hidden'; document.body.appendChild(e); return e; };
+    var svhEl = mk('100svh'), lvhEl = mk('100lvh');
     var show = function () {
       var vv = window.visualViewport || {};
       dbg.textContent = 'inner ' + innerWidth + '×' + innerHeight + '\nscreen ' + screen.width + '×' + screen.height +
         '\nvv ' + Math.round(vv.width || 0) + '×' + Math.round(vv.height || 0) + ' top ' + Math.round(vv.offsetTop || 0) +
         '\nclient ' + document.documentElement.clientHeight + '\nembedded ' + embedded + ' touch ' + touch +
+        '\nfixed-area ' + Math.round(probe.getBoundingClientRect().height) + ' fixed-cut ' + Math.round(fixedCut()) +
+        '\nsvh ' + Math.round(svhEl.getBoundingClientRect().height) + ' lvh ' + Math.round(lvhEl.getBoundingClientRect().height) +
         '\nio ' + Math.round(ioVb) + ' est ' + Math.round(estimate()) + ' vv-cut ' + Math.round(viewportCut()) +
         '\n--vb ' + root.style.getPropertyValue('--vb');
     };
@@ -8044,9 +8055,9 @@ function islandCard(isl) {
     <h2>${esc(tr(isl.d.name, isl.d.en))}</h2>
     <p class="lead">${esc(tr(isl.d.summary, isl.d.summaryEn))}</p>
     ${isl.d.story ? `<span class="story-tag">✦ ${esc(tr('故事場景', 'Story scene'))}：${esc(tr(isl.d.story.zh, isl.d.story.en))}</span>` : ''}
-    ${thumb ? `<img class="banner" alt="" src="${thumb}">` : ''}
     <h3 class="eyebrow">${tr('內容', 'INSIDE')} · ${isl.items.length}</h3>
-    ${itemListHTML(isl)}`;
+    ${itemListHTML(isl)}
+    ${thumb ? `<img class="banner" alt="" src="${thumb}">` : ''}`;   // 內容清單放在圖片上面：平板上第 4、5 項也一眼看得到、好點
 }
 function itemCard(it) {
   const d = it.d, isl = it.isl;
