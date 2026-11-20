@@ -3613,6 +3613,8 @@ window.OddQGame = (() => {
         const n = addBadge();
         const card = { q: x.q, type: ODDQ_BOOKS[x.book - 1], lesson: lessonOf(x), lv: `${tier.name} ${tier.stars}｜${c.ic} ${c.name}`, lvShort: tier.name, tier: c.tier, sections: r.sections, read: x.read || '', next: x.next, stu };
         const up = ODDQ_CHALLENGES.find((t) => t.tier === c.tier + 1);
+        // 送一筆紀錄到老師的 Google 試算表（有設定網址才會送）
+        const sentRec = window.sendRecord && window.sendRecord({ type: 'oddq', cls: stu.cls, seat: stu.seat, name: stu.name, book: card.type, lesson: card.lesson, question: card.q, level: card.lv, card: card.sections.map((sc) => `${sc.label}：${sc.body}${sc.foot ? `（${sc.foot}）` : ''}`).join('\n') });
         fq('actbox').hidden = true; fq('flipMsg').textContent = '';
         fq('cardOut').innerHTML = `
           <div class="cx-card">
@@ -3623,6 +3625,7 @@ window.OddQGame = (() => {
             <div class="nx">🐾 ${esc(card.next)}</div>
           </div>
           <p class="cx-flip-msg">${esc(r.cheer || '')}</p>
+          ${sentRec ? '<p class="cx-flip-msg">📮 這張思辨卡已交出，會存進老師的學習紀錄表。</p>' : ''}
           <div class="cx-row">
             <button class="btn cx-main" type="button" data-cx="dl">📥 下載思辨卡</button>
             <button class="btn" type="button" data-cx="cp">📋 複製文字</button>
@@ -5008,7 +5011,11 @@ window.HoushanSEL = (() => {
     const stamps = get('stamps', []);
     if (!stamps.includes(u.id)) set('stamps', stamps.concat(u.id));
     pass('exit');
-    msg.innerHTML = `<span class="hs-pop">後山<br>印章</span> ${esc(w.cls)} 班 ${esc(w.seat)} 號 ${esc(w.name)}，蓋章成功！你已經收集 ${get('stamps', []).length} / ${HOUSHAN_UNITS.length} 枚印章。`;
+    // 送一筆紀錄到老師的 Google 試算表（有設定網址才會送）
+    const stars = u.quiz.filter((_, k) => st.quiz[k] && st.quiz[k].tries === 1).length;
+    const mood = get('mood', null), theme = HOUSHAN_THEMES.find((t) => t.k === u.theme);
+    const sent = window.sendRecord && window.sendRecord({ type: 'houshan', cls: w.cls, seat: w.seat, name: w.name, theme: theme ? theme.name : '', unit: u.title, exit: ta.value.trim(), stars: `${stars}/${u.quiz.length}`, mood: mood != null && HOUSHAN_MOODS[mood] ? HOUSHAN_MOODS[mood].name : '' });
+    msg.innerHTML = `<span class="hs-pop">後山<br>印章</span> ${esc(w.cls)} 班 ${esc(w.seat)} 號 ${esc(w.name)}，蓋章成功！你已經收集 ${get('stamps', []).length} / ${HOUSHAN_UNITS.length} 枚印章。${sent ? '<br>📮 出口卡已交出，會存進老師的學習紀錄表。' : ''}`;
   }
 
   function onClick(e) {
@@ -5143,6 +5150,37 @@ window.HoushanSEL = (() => {
   ['focus', 'touchend', 'pointerup'].forEach(function (ev) { window.addEventListener(ev, function () { write(); setTimeout(write, 350); }, { passive: true }); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) write(); });
 
+})();
+</script>
+<script>
+/* ================================================================
+   學生學習紀錄 → 老師的 Google 試算表
+   RECORD_ENDPOINT 填入 Apps Script「網頁應用程式網址」（結尾 /exec）後才會開始傳送；空白就完全不傳。
+   Apps Script 程式在專案的 google-apps-script/learning-records.gs。
+   傳不出去時（例如沒網路），紀錄先存在這台裝置，之後自動補送。
+   ================================================================ */
+window.RECORD_ENDPOINT = window.RECORD_ENDPOINT || '';
+window.sendRecord = (function () {
+  var KEY = 'records:queue', MAX = 200, mem = [], busy = false;
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return mem; } }
+  function save(q) { mem = q; try { localStorage.setItem(KEY, JSON.stringify(q)); } catch (e) { /* 私密模式：只存在記憶體 */ } }
+  function flush() {
+    var url = window.RECORD_ENDPOINT, q = load();
+    if (!url || busy || !q.length || !window.fetch) return;
+    busy = true;
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(q[0]), keepalive: true })
+      .then(function () { var cur = load(); cur.shift(); save(cur); busy = false; flush(); }, function () { busy = false; });
+  }
+  window.addEventListener('online', flush);
+  setTimeout(flush, 3000);
+  setInterval(flush, 60000);
+  return function send(rec) {
+    if (!window.RECORD_ENDPOINT) return false;
+    var q = load(); rec.at = new Date().toISOString(); q.push(rec);
+    if (q.length > MAX) q = q.slice(q.length - MAX);
+    save(q); flush();
+    return true;
+  };
 })();
 </script>
 <script type="importmap">
