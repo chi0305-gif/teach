@@ -5159,7 +5159,7 @@ window.HoushanSEL = (() => {
    Apps Script 程式在專案的 google-apps-script/learning-records.gs。
    傳不出去時（例如沒網路），紀錄先存在這台裝置，之後自動補送。
    ================================================================ */
-window.RECORD_ENDPOINT = window.RECORD_ENDPOINT || '';
+window.RECORD_ENDPOINT = window.RECORD_ENDPOINT || 'https://script.google.com/macros/s/AKfycby9OblglGmJsmRFS9tL8WOlFVOnpiIjCBjEV5SxK-VF06oWCVkFNAAX1KKUWQXna-ng/exec';
 window.sendRecord = (function () {
   var KEY = 'records:queue', MAX = 200, mem = [], busy = false;
   function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return mem; } }
