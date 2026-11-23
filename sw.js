@@ -8,7 +8,7 @@
  *
  * 改了這個檔案（或想強迫所有裝置清掉舊快取）時，把 VERSION 改一個數字即可。
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CORE = 'core-' + VERSION;
 const RUNTIME = 'runtime-' + VERSION;
 const CORE_FILES = [
