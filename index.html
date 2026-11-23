@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>鏡中番薯的國文世界</title>
+<meta name="description" content="四維高中國文科互動學習網站：島嶼探索、後山厚閱讀 SEL、柴郡貓思辨卡與各種國文小遊戲。">
+<!-- PWA：可「加入主畫面」、離線也能打開（設定在 manifest.webmanifest 與 sw.js） -->
+<meta name="theme-color" content="#f7b6cf">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="番薯國文">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
 <script>
 /* ================================================================
    DATA：整座國文世界完全由這個物件驅動
@@ -1397,6 +1409,9 @@ body.hs-open { overflow: hidden; }
   </button>
   <button class="btn" id="btnHelp" title="操作說明" data-en-label="How to use">
     <svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 7 0 0 1 17 0z"/><path d="M9.5 12v6a2.5 2.5 0 0 0 5 0v-6"/><circle cx="8.5" cy="8.6" r=".9"/><circle cx="15.3" cy="9" r=".9"/><circle cx="12" cy="6.6" r=".9"/></svg><span data-en="Help">說明</span>
+  </button>
+  <button class="btn" id="btnInstall" hidden title="安裝到主畫面" data-en-label="Install app">
+    <svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M12 7v7M9 11.5l3 3 3-3M10.5 18.5h3"/></svg><span data-en="Install">安裝</span>
   </button>
 </nav>
 </div>
@@ -5181,6 +5196,40 @@ window.sendRecord = (function () {
     save(q); flush();
     return true;
   };
+})();
+</script>
+<script>
+/* PWA：註冊 Service Worker（離線快取）＋「安裝」按鈕
+   只在 https 網站（GitHub Pages）或本機測試時啟用；嵌在 Google 協作平台裡不顯示安裝按鈕。 */
+(function () {
+  var embedded = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
+  var okHost = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if ('serviceWorker' in navigator && okHost) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  if (embedded || standalone || !okHost) return;
+  var deferred = null;
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function btn() { return document.getElementById('btnInstall'); }
+  function show() { var b = btn(); if (b) b.hidden = false; }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; show(); });
+  window.addEventListener('appinstalled', function () { deferred = null; var b = btn(); if (b) b.hidden = true; });
+  document.addEventListener('DOMContentLoaded', function () {
+    var b = btn(); if (!b) return;
+    if (isIOS) show();   // iPad／iPhone 沒有安裝視窗，改成顯示步驟
+    b.addEventListener('click', function () {
+      if (deferred) {
+        deferred.prompt();
+        deferred.userChoice.finally(function () { deferred = null; b.hidden = true; });
+      } else {
+        alert('加入主畫面的方法：\n\niPad／iPhone（Safari）：按上方或下方的「分享」按鈕 → 「加入主畫面」。\n\nAndroid／電腦（Chrome、Edge）：按網址列右邊的「安裝」圖示，或瀏覽器選單 →「安裝應用程式」。');
+      }
+    });
+  });
 })();
 </script>
 <script type="importmap">
